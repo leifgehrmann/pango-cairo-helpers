@@ -58,7 +58,7 @@ def left_to_right_length(line_string: LineString) -> float:
     return _directional_length(line_string, direction_aggregator)
 
 
-def right_to_left_length(line_string: LineString) -> float:
+def right_to_left_length(line_string: LineString) ->  float:
     """
     :param line_string:
         the ``LineString`` to measure
