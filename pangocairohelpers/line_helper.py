@@ -1,5 +1,9 @@
+"""
+    Functions to help with a single line segments.
+"""
+
 import math
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 Coordinate = Tuple[float, float]
 
 
@@ -18,15 +22,18 @@ def coords_length(coord_a: Coordinate, coord_b: Coordinate) -> float:
     )
 
 
-def coords_are_left_to_right(coord_a, coord_b) -> Optional[bool]:
+def coords_are_left_to_right(
+        coord_a: Coordinate,
+        coord_b: Coordinate
+) -> Optional[bool]:
     """
     :param coord_a:
         the first coordinate
     :param coord_b:
         the second coordinate
     :return:
-        if the coordinates are going left to right, or right to left.
-        In cases where the line is going vertical, ``None`` is returned.
+        ``True`` if the coordinates are going left to right, ``False`` if right
+        to left. If the line is vertical, ``None`` is returned.
     """
     if coord_b[0] - coord_a[0] == 0:
         return None

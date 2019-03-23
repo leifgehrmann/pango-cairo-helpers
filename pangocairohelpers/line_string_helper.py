@@ -1,15 +1,23 @@
+"""
+    Functions to help with Shapely's ``LineString`` class.
+"""
+
 from shapely.geometry import LineString
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 from pangocairohelpers.line_helper import coords_are_left_to_right
 from pangocairohelpers.line_helper import coords_length
-Coordinate = Tuple[float, float]
 
 
-def directional_length(
+def _directional_length(
         line_string: LineString,
         aggregate_rule: Dict[Optional[bool], bool]
 ) -> float:
     """
+    :param line_string:
+        the ``LineString`` to measure
+    :param aggregate_rule:
+        a mapping of ``True``, ``False`` and ``None`` to whether the length
+        should be aggregated or not (``True`` if it should be aggregated)
     :return:
         the length of all the line segments that go left (-x) to
         right (+x)d
@@ -35,9 +43,11 @@ def directional_length(
 
 def left_to_right_length(line_string: LineString) -> float:
     """
+    :param line_string:
+        the ``LineString`` to measure
     :return:
-        the length of all the line segments that go left (-x) to
-        right (+x)d
+        the length of all the line segments in ``line_string`` that go
+        left (-x) to right (+x)
     """
     direction_aggregator = {
         True: True,
@@ -45,14 +55,16 @@ def left_to_right_length(line_string: LineString) -> float:
         None: True,
     }
 
-    return directional_length(line_string, direction_aggregator)
+    return _directional_length(line_string, direction_aggregator)
 
 
 def right_to_left_length(line_string: LineString) -> float:
     """
+    :param line_string:
+        the ``LineString`` to measure
     :return:
-        the length of all the line segments that go right (+x) to
-        left (-x)
+        the length of all the line segments in ``line_string`` that go
+        right (+x) to left (-x)
     """
     direction_aggregator = {
         True: False,
@@ -60,4 +72,4 @@ def right_to_left_length(line_string: LineString) -> float:
         None: True,
     }
 
-    return directional_length(line_string, direction_aggregator)
+    return _directional_length(line_string, direction_aggregator)
