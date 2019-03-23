@@ -1,8 +1,0 @@
-pip==19.0.3
-pytest
-tox
-coverage
-flake8
-Sphinx
-sphinx_rtd_theme
-twine
