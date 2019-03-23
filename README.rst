@@ -1,4 +1,4 @@
 pango-cairo-helpers
 ===================
 
-Helper modules for rendering text using pango and cairo
+Helper modules for rendering text using Pango and Cairo.
