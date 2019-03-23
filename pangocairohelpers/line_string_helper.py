@@ -1,23 +1,63 @@
 from shapely.geometry import LineString
+from typing import Dict, Optional, Tuple
+from pangocairohelpers.line_helper import coords_are_left_to_right
+from pangocairohelpers.line_helper import coords_length
+Coordinate = Tuple[float, float]
 
 
-class LineStringHelper:
+def directional_length(
+        line_string: LineString,
+        aggregate_rule: Dict[Optional[bool], bool]
+) -> float:
+    """
+    :return:
+        the length of all the line segments that go left (-x) to
+        right (+x)d
+    """
+    last_coord = None
+    length = 0
 
-    def __init__(self, line_string: LineString):
-        self.line_string = line_string
+    for coord in line_string.coords:
+        if last_coord is None:
+            last_coord = coord
+            continue
 
-    def get_left_to_right_length(self) -> float:
-        """
-        :return:
-            the length of all the line segments that go left (-x) to
-            right (+x)
-        """
-        return self.line_string.length
+        should_aggregate = aggregate_rule.get(
+            coords_are_left_to_right(last_coord, coord),
+            False
+        )
+        if should_aggregate:
+            length += coords_length(last_coord, coord)
+        last_coord = coord
 
-    def get_right_to_left_length(self) -> float:
-        """
-        :return:
-            the length of all the line segments that go right (+x) to
-            left (-x)
-        """
-        return self.line_string.length
+    return length
+
+
+def left_to_right_length(line_string: LineString) -> float:
+    """
+    :return:
+        the length of all the line segments that go left (-x) to
+        right (+x)d
+    """
+    direction_aggregator = {
+        True: True,
+        False: False,
+        None: True,
+    }
+
+    return directional_length(line_string, direction_aggregator)
+
+
+def right_to_left_length(line_string: LineString) -> float:
+    """
+    :return:
+        the length of all the line segments that go right (+x) to
+        left (-x)
+    """
+    direction_aggregator = {
+        True: False,
+        False: True,
+        None: True,
+    }
+
+    return directional_length(line_string, direction_aggregator)
