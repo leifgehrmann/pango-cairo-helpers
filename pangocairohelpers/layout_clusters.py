@@ -6,13 +6,14 @@ from shapely.geometry import Point
 
 class LayoutClusters:
     """
-    A decomposed representation of Layout as Clusters (or
-    ``pangocffi.GlyphItem``)
+    A decomposed representation of ``pangocffi.Layout`` as clusters (in other
+    words ``pangocffi.GlyphItem``)
 
     This class is useful in scenarios where one wants to iterate over each
     individual cluster (commonly a single glyph or character).
 
-    Warning: RTL directional text like Arabic or Hebrew is not supported.
+    **Warning:** RTL directional text like Arabic or Hebrew is not supported for
+    now.
     """
 
     def __init__(self, layout: Layout):

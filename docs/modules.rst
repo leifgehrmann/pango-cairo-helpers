@@ -3,12 +3,20 @@ API reference
 
 .. module:: pangocairohelpers
 
+Pango Helpers
+_____________
+
+.. autoclass:: pangocairohelpers.LayoutClusters
+
+Shapely Helpers
+_______________
+
 Line Helper
-_________________
+-----------
 
 .. automodule:: pangocairohelpers.line_helper
 
 LineString Helper
-_________________
+-----------------
 
 .. automodule:: pangocairohelpers.line_string_helper
