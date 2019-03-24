@@ -1,6 +1,6 @@
 cairocffi >= 1.0.2
 pangocffi >= 0.4.0
-pangocairocffi >= 0.2.2
+pangocairocffi >= 0.2.6
 shapely >= 1.6.4.post2
 
 pip==19.0.3

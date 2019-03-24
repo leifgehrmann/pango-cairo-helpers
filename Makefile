@@ -53,7 +53,7 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 pangocairohelpers tests
 
-tests: ## run tests quickly with the default Python
+tests: clean ## run tests quickly with the default Python
 	python setup.py test
 
 tests-all: clean ## run tests on all minor python versions
