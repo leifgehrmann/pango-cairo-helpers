@@ -37,14 +37,14 @@ class LayoutClusters:
         layout_run_iter = self.layout.get_iter()
         layout_cluster_iter = self.layout.get_iter()
 
-        while True:
+        has_next_run = True
+        while has_next_run:
 
             layout_run = layout_run_iter.get_run()
             layout_line_baseline = layout_run_iter.get_baseline()
 
             if layout_run is None:
-                if not layout_run_iter.next_run():
-                    break
+                has_next_run = layout_run_iter.next_run()
                 continue
 
             clusters = self._get_clusters_from_glyph_item(layout_run)
@@ -57,8 +57,7 @@ class LayoutClusters:
                     units_to_double(layout_line_baseline)
                 ))
 
-            if not layout_run_iter.next_run():
-                break
+            has_next_run = layout_run_iter.next_run()
 
     def _split_glyph_item_at_first_cluster(
             self,
