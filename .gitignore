@@ -11,6 +11,9 @@ venv
 # Tox
 .tox
 
+# Test artifacts
+tests/functional/output/*
+
 # PyCharm
 .idea
 

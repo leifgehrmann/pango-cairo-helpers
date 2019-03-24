@@ -109,6 +109,13 @@ class LayoutClusters:
         cluster_glyph_items.append(glyph_item_copy)
         return cluster_glyph_items
 
+    def get_layout(self) -> Layout:
+        """
+        :return:
+            the layout on which this instance is based on
+        """
+        return self.layout
+
     def get_clusters(self) -> List[GlyphItem]:
         """
         :return:
