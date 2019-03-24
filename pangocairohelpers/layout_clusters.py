@@ -12,8 +12,8 @@ class LayoutClusters:
     This class is useful in scenarios where one wants to iterate over each
     individual cluster (commonly a single glyph or character).
 
-    **Warning:** RTL directional text like Arabic or Hebrew is not supported for
-    now.
+    **Warning:** RTL directional text like Arabic or Hebrew is not supported
+    for now.
     """
 
     def __init__(self, layout: Layout):
