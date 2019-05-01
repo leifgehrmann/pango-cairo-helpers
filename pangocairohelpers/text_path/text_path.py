@@ -1,7 +1,7 @@
 from typing import List
 
 from cairocffi import Context
-from pangocffi import Layout
+from pangocffi import Layout, Alignment
 from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
@@ -20,11 +20,17 @@ class TextPath:
     Left-to-right text is assumed.
     """
 
-    def __init__(self, line_string: LineString, layout: Layout):
+    def __init__(
+            self,
+            line_string: LineString,
+            layout: Layout,
+            alignment: Alignment = Alignment.LEFT
+    ):
         self.layout = layout
         self.layout_text = layout.get_text()
         self.line_string = line_string
         self.layout_clusters = LayoutClusters(self.layout)
+        self.alignment = alignment
 
         # Todo: throw an error if the layout is multi-lined
 
