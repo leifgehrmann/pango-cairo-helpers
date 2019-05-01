@@ -35,10 +35,12 @@ class TextPath:
         # Todo: throw an error if the layout is multi-lined
 
     def text_fits(self) -> bool:
+        # Todo: is this algorithm realistic?
         last_position = self.layout_clusters.get_logical_positions()[-1]
         return last_position.x < self.line_string.length
 
     def get_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
+        # Todo: Make this function correct
         glyph_items = self.layout_clusters.get_clusters()
         logical_positions = self.layout_clusters.get_logical_positions()
         text_path_glyph_items = []
@@ -52,14 +54,23 @@ class TextPath:
         return text_path_glyph_items
 
     def compute_boundaries(self) -> MultiPolygon:
+        # Todo:
         pass
 
     def draw(self, context: Context):
         text_path_glyph_items = self.get_text_path_glyph_items()
         for text_path_glyph_item in text_path_glyph_items:
+            context.save()
+            # Todo: Get correct translation
+            # context.translate(
+            #     pangocffi.units_to_double(layout_run_extents.x),
+            #     pangocffi.units_to_double(layout_line_baseline)
+            # )
+            context.rotate(text_path_glyph_item.rotation)
             show_glyph_item(
                 context,
                 self.layout_text,
                 text_path_glyph_item.glyph_item
             )
+            context.restore()
 
