@@ -46,9 +46,12 @@ class TextPath:
         logical_positions = self.layout_clusters.get_logical_positions()
         text_path_glyph_items = []
         for glyph_item, logical_position in zip(glyph_items, logical_positions):
+            glyph_start_position = self.line_string.interpolate(
+                logical_position.x
+            )
             text_path_glyph_item = TextPathGlyphItem(
                 glyph_item,
-                logical_position,
+                glyph_start_position,
                 0
             )
             text_path_glyph_items.append(text_path_glyph_item)
@@ -61,13 +64,12 @@ class TextPath:
     def draw(self, context: Context):
         text_path_glyph_items = self.get_text_path_glyph_items()
         for text_path_glyph_item in text_path_glyph_items:
+            glyph_position = text_path_glyph_item.position
+            glyph_rotation = text_path_glyph_item.rotation
+
             context.save()
-            # Todo: Get correct translation
-            # context.translate(
-            #     pangocffi.units_to_double(layout_run_extents.x),
-            #     pangocffi.units_to_double(layout_line_baseline)
-            # )
-            context.rotate(text_path_glyph_item.rotation)
+            context.translate(glyph_position.x, glyph_position.y)
+            context.rotate(glyph_rotation)
             show_glyph_item(
                 context,
                 self.layout_text,
