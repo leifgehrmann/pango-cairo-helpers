@@ -26,13 +26,14 @@ class TextPath:
             layout: Layout,
             alignment: Alignment = Alignment.LEFT
     ):
+        if layout.get_line_count() > 1:
+            raise ValueError('layout cannot be more than one line.')
+
         self.layout = layout
         self.layout_text = layout.get_text()
         self.line_string = line_string
         self.layout_clusters = LayoutClusters(self.layout)
         self.alignment = alignment
-
-        # Todo: throw an error if the layout is multi-lined
 
     def text_fits(self) -> bool:
         # Todo: is this algorithm realistic?
