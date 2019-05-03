@@ -2,7 +2,7 @@
     Functions to help with Shapely's ``LineString`` class.
 """
 
-from shapely.geometry import LineString
+from shapely.geometry import LineString, Point
 from typing import Dict, Optional
 from pangocairohelpers.line_helper import coords_are_left_to_right
 from pangocairohelpers.line_helper import coords_length
@@ -73,3 +73,19 @@ def right_to_left_length(line_string: LineString) -> float:
     }
 
     return _directional_length(line_string, direction_aggregator)
+
+
+def interpolated_distance_of_point(
+        line_string: LineString,
+        point: Point
+) -> float:
+    """
+    :param line_string:
+        the ``LineString`` to find the distance on
+    :param point:
+        the point to find on the line
+    :return:
+        the interpolation distance to calculate the position of the point on
+        the line string
+    """
+    return line_string.project(point)
