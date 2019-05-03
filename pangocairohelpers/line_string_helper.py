@@ -2,8 +2,8 @@
     Functions to help with Shapely's ``LineString`` class.
 """
 
-from shapely.geometry import LineString, Point
-from typing import Dict, Optional
+from shapely.geometry import LineString, Point, LinearRing, MultiPoint
+from typing import Dict, Optional, List
 from pangocairohelpers.line_helper import coords_are_left_to_right
 from pangocairohelpers.line_helper import coords_length
 
@@ -89,3 +89,32 @@ def interpolated_distance_of_point(
         the line string
     """
     return line_string.project(point)
+
+
+def points_at_distance_from_point_on_line_string(
+        line_string: LineString,
+        point: Point,
+        distance: float
+) -> List[Point]:
+    """
+    :param line_string:
+        the ``LineString`` to find points on
+    :param point:
+        the circle's center point to find intersections on the line
+    :param distance:
+        the circle's radius to find intersections on the line
+    :return:
+        a list of points that exist in the ``line_string`` and intersect the
+        circle at ``point`` with the radius ``distance``
+    """
+    circle = LinearRing(point.buffer(distance).exterior.coords)
+    intersections = line_string.intersection(circle)
+
+    if isinstance(intersections, Point):
+        return [intersections]
+    elif isinstance(intersections, MultiPoint):
+        return list(intersections.geoms)
+    elif intersections.is_empty:
+        return []
+    else:
+        raise ValueError('Unexpected intersection type returned')

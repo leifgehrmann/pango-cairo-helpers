@@ -19,6 +19,12 @@ test_interpolated_distance_of_point_on_line_data = [
     (LineString([[0, 0], [0.5, 1], [0, 2]]), Point([1, 1]), math.sqrt(1.25)),
 ]
 
+test_points_at_distance_from_point_on_line_string_data = [
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 1]), 0.5, 2),
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 2]), 0.5, 1),
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 3]), 0.5, 0)
+]
+
 
 @pytest.mark.parametrize(
     "line_string,expected_lrt,expected_rtl",
@@ -63,3 +69,37 @@ def test_interpolated_distance_of_point_on_line(
     distance = helper.interpolated_distance_of_point(line_string, point)
     assert isinstance(distance, float)
     assert distance == expected_distance
+
+
+@pytest.mark.parametrize(
+    "line_string,point,distance,expected_count",
+    test_points_at_distance_from_point_on_line_string_data
+)
+def test_points_at_distance_from_point_on_line_string(
+        line_string: LineString,
+        point: Point,
+        distance: float,
+        expected_count: int
+):
+    intersections = helper.points_at_distance_from_point_on_line_string(
+        line_string,
+        point,
+        distance
+    )
+
+    assert len(intersections) == expected_count
+    for intersection in intersections:
+        assert isinstance(intersection, Point)
+
+
+def test_points_at_distance_from_point_on_line_string_raises_value_error():
+    line_string = LineString(Point([0, 0]).buffer(1).exterior.coords)
+    point = Point([0, 0])
+    distance = 1
+    with pytest.raises(ValueError):
+        helper.points_at_distance_from_point_on_line_string(
+            line_string,
+            point,
+            distance
+        )
+
