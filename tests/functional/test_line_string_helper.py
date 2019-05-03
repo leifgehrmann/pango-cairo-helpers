@@ -103,3 +103,7 @@ def test_points_at_distance_from_point_on_line_string_raises_value_error():
             distance
         )
 
+
+def test_next_offset_from_offset_in_line_string():
+    pass
+    # Todo

@@ -118,3 +118,40 @@ def points_at_distance_from_point_on_line_string(
         return []
     else:
         raise ValueError('Unexpected intersection type returned')
+
+
+def next_offset_from_offset_in_line_string(
+        line_string: LineString,
+        offset: float,
+        distance: float
+) -> Optional[float]:
+    """
+    :param line_string:
+        the ``LineString`` to find the offset on
+    :param offset:
+        # Todo:
+    :param distance:
+        # Todo:
+    :return:
+        # Todo:
+    """
+    current_offset_point = line_string.interpolate(offset)
+    points_at_distance = points_at_distance_from_point_on_line_string(
+            line_string,
+            current_offset_point,
+            distance
+        )
+
+    next_minimum_point_offset = None
+    for point in points_at_distance:
+        point_offset = interpolated_distance_of_point(
+            line_string,
+            point
+        )
+        if point_offset < current_offset_point:
+            continue
+        if next_minimum_point_offset is None or \
+                next_minimum_point_offset > point_offset:
+            next_minimum_point_offset = point_offset
+
+    return next_minimum_point_offset
