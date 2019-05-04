@@ -10,21 +10,6 @@ test_get_lrt_and_rtl_length_data = [
     (LineString([[0, 0], [1, 0], [0, 1], [1, 1]]), 2, math.sqrt(2)),
 ]
 
-test_interpolated_distance_of_point_on_line_data = [
-    # On line
-    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 0.5]), 0.5),
-    (LineString([[0, 0], [0.5, 1], [0, 2]]), Point([0.5, 1]), math.sqrt(1.25)),
-    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 3]), 2),
-    # Off line
-    (LineString([[0, 0], [0.5, 1], [0, 2]]), Point([1, 1]), math.sqrt(1.25)),
-]
-
-test_points_at_distance_from_point_on_line_string_data = [
-    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 1]), 0.5, 2),
-    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 2]), 0.5, 1),
-    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 3]), 0.5, 0)
-]
-
 
 @pytest.mark.parametrize(
     "line_string,expected_lrt,expected_rtl",
@@ -57,6 +42,16 @@ def test_get_rtl_length_is_inverse_ltr_length_for_vertical_lines():
     assert ltr_length == rtl_length
 
 
+test_interpolated_distance_of_point_on_line_data = [
+    # On line
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 0.5]), 0.5),
+    (LineString([[0, 0], [0.5, 1], [0, 2]]), Point([0.5, 1]), math.sqrt(1.25)),
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 3]), 2),
+    # Off line
+    (LineString([[0, 0], [0.5, 1], [0, 2]]), Point([1, 1]), math.sqrt(1.25)),
+]
+
+
 @pytest.mark.parametrize(
     "line_string,point,expected_distance",
     test_interpolated_distance_of_point_on_line_data
@@ -69,6 +64,13 @@ def test_interpolated_distance_of_point_on_line(
     distance = helper.interpolated_distance_of_point(line_string, point)
     assert isinstance(distance, float)
     assert distance == expected_distance
+
+
+test_points_at_distance_from_point_on_line_string_data = [
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 1]), 0.5, 2),
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 2]), 0.5, 1),
+    (LineString([[0, 0], [0, 1], [0, 2]]), Point([0, 3]), 0.5, 0)
+]
 
 
 @pytest.mark.parametrize(
@@ -104,6 +106,34 @@ def test_points_at_distance_from_point_on_line_string_raises_value_error():
         )
 
 
-def test_next_offset_from_offset_in_line_string():
-    pass
-    # Todo
+test_get_lrt_and_rtl_length_data = [
+    # Basic x-axis tests
+    (LineString([[0, 0], [10, 0]]), 3, 1, 4),
+    (LineString([[2, 0], [10, 0]]), 9, 1.5, None),
+    (LineString([[0, 0], [10, 0]]), 0, 10, 10),
+    # Test x-y axis
+    (LineString([[0, 0], [0, 1], [1, 0], [3, 0]]), 0, 2, math.sqrt(2) + 2),
+    # Test multiple choice example
+    (LineString([[0, 0], [2, 0], [0, 1], [2, 1]]), 1, 0.5, 1.5),
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,current_offset,distance,expected_next_offset",
+    test_get_lrt_and_rtl_length_data
+)
+def test_next_offset_from_offset_in_line_string(
+        line_string: LineString,
+        current_offset: float,
+        distance: float,
+        expected_next_offset: float
+):
+    next_offset = helper.next_offset_from_offset_in_line_string(
+        line_string,
+        current_offset,
+        distance
+    )
+    if expected_next_offset is None:
+        assert next_offset is None
+    else:
+        assert next_offset == expected_next_offset

@@ -122,20 +122,24 @@ def points_at_distance_from_point_on_line_string(
 
 def next_offset_from_offset_in_line_string(
         line_string: LineString,
-        offset: float,
+        current_offset: float,
         distance: float
 ) -> Optional[float]:
     """
+    Used to find the next point on a line_string that is at a certain distance
+    away from the current point on the line.
+
     :param line_string:
         the ``LineString`` to find the offset on
-    :param offset:
-        # Todo:
+    :param current_offset:
+        the offset to start at
     :param distance:
-        # Todo:
+        the distance the next offset should be
     :return:
-        # Todo:
+        the next offset that is ``distance`` units away from the current
+        offset on the ``line_string``
     """
-    current_offset_point = line_string.interpolate(offset)
+    current_offset_point = line_string.interpolate(current_offset)
     points_at_distance = points_at_distance_from_point_on_line_string(
             line_string,
             current_offset_point,
@@ -148,7 +152,7 @@ def next_offset_from_offset_in_line_string(
             line_string,
             point
         )
-        if point_offset < current_offset_point:
+        if point_offset < current_offset:
             continue
         if next_minimum_point_offset is None or \
                 next_minimum_point_offset > point_offset:
