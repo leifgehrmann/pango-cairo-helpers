@@ -1,4 +1,5 @@
-from typing import List
+import math
+from typing import List, Optional, Tuple
 
 from cairocffi import Context
 from pangocffi import Layout, Alignment
@@ -7,6 +8,7 @@ from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
 from pangocairohelpers.text_path import TextPathGlyphItem
+from pangocairohelpers import line_string_helper
 
 
 class TextPath:
@@ -40,12 +42,95 @@ class TextPath:
         last_position = self.layout_clusters.get_logical_positions()[-1]
         return last_position.x < self.line_string.length
 
+    def _calculate_rotation_between_two_offsets(
+            self,
+            offset_a: float,
+            offset_b: float
+    ):
+        """
+        :param offset_a:
+            the starting offset
+        :param offset_b: 
+            the ending offset
+        :return:
+            the rotation in radians relative to the positive x axis 
+        """
+        offset_a_point = self.line_string.interpolate(offset_a)
+        offset_b_point = self.line_string.interpolate(offset_b)
+        return math.atan2(
+            offset_b_point.y - offset_a_point.y,
+            offset_b_point.x - offset_a_point.x
+        )
+
+    def _calculate_rotation_for_glyph_item_at_offset(
+            self,
+            offset: float,
+            distance: float
+    ) -> Optional[float]:
+        """
+        :param offset:
+        :param distance:
+
+        :return:
+            the angle that this glyph must use when following the path.
+        """
+        new_offset = line_string_helper.next_offset_from_offset_in_line_string(
+            self.line_string,
+            offset,
+            distance
+        )
+        if new_offset is None:
+            return None
+        offset_point = self.line_string.interpolate(offset)
+        new_offset_point = self.line_string.interpolate(new_offset)
+        return math.atan2(
+            new_offset_point.y - offset_point.y,
+            new_offset_point.x - offset_point.x
+        )
+    
+    def get_rotation_and_next_offset_for_glyph_item(
+            self,
+            logical_width: float,
+            offset: float
+    ) -> Optional[Tuple[float, float]]:
+        """
+        :param logical_width:
+            the logical width of the glyph item
+        :param offset: 
+            the offset to start from
+        :return:
+            a tuple of rotation and the next offset to start the next
+            glyph item. ``None`` if there are no more offsets to reach
+        """
+        new_offset = line_string_helper.next_offset_from_offset_in_line_string(
+            self.line_string,
+            offset,
+            logical_width
+        )
+        if new_offset is None:
+            return None
+        
+        rotation = self._calculate_rotation_for_glyph_item_at_offset(
+            offset,
+            new_offset
+        )
+        return rotation, new_offset
+
     def get_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
         # Todo: Make this function correct
         glyph_items = self.layout_clusters.get_clusters()
         logical_positions = self.layout_clusters.get_logical_positions()
         text_path_glyph_items = []
-        for glyph_item, logical_position in zip(glyph_items, logical_positions):
+
+        line_string_offset = 0
+        glyph_items_data = zip(glyph_items, logical_positions)
+        for glyph_item, logical_position in glyph_items_data:
+            rotation, next_offset = \
+                self.get_rotation_and_next_offset_for_glyph_item(
+                    logical_position,
+                    line_string_offset
+                )
+            self._calculate_rotation_for_glyph_item_at_offset()
             glyph_start_position = self.line_string.interpolate(
                 logical_position.x
             )
@@ -55,6 +140,7 @@ class TextPath:
                 0
             )
             text_path_glyph_items.append(text_path_glyph_item)
+            line_string_offset = next_offset
         return text_path_glyph_items
 
     def compute_boundaries(self) -> MultiPolygon:
