@@ -14,6 +14,6 @@ def test_layout_clusters_properties_have_same_length():
 
     assert layout_clusters.get_layout() is layout
     assert len(layout_clusters.get_clusters()) == expected_length
-    assert len(layout_clusters.get_logical_positions()) == expected_length
+    assert len(layout_clusters.get_logical_extents()) == expected_length
 
     surface.finish()

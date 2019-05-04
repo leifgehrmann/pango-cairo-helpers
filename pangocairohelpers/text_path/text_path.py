@@ -39,7 +39,7 @@ class TextPath:
 
     def text_fits(self) -> bool:
         # Todo: is this algorithm realistic?
-        last_position = self.layout_clusters.get_logical_positions()[-1]
+        last_position = self.layout_clusters.get_logical_extents()[-1]
         return last_position.x < self.line_string.length
 
     def _calculate_rotation_between_two_offsets(
@@ -119,7 +119,7 @@ class TextPath:
     def get_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
         # Todo: Make this function correct
         glyph_items = self.layout_clusters.get_clusters()
-        logical_positions = self.layout_clusters.get_logical_positions()
+        logical_positions = self.layout_clusters.get_logical_extents()
         text_path_glyph_items = []
 
         line_string_offset = 0
