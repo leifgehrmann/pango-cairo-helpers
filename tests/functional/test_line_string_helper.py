@@ -106,7 +106,7 @@ def test_points_at_distance_from_point_on_line_string_raises_value_error():
         )
 
 
-test_get_lrt_and_rtl_length_data = [
+test_next_offset_from_offset_in_line_string_data = [
     # Basic x-axis tests
     (LineString([[0, 0], [10, 0]]), 3, 1, 4),
     (LineString([[2, 0], [10, 0]]), 9, 1.5, None),
@@ -120,7 +120,7 @@ test_get_lrt_and_rtl_length_data = [
 
 @pytest.mark.parametrize(
     "line_string,current_offset,distance,expected_next_offset",
-    test_get_lrt_and_rtl_length_data
+    test_next_offset_from_offset_in_line_string_data
 )
 def test_next_offset_from_offset_in_line_string(
         line_string: LineString,
