@@ -1,9 +1,10 @@
 """
     Functions to help with Shapely's ``LineString`` class.
 """
+import math
 
 from shapely.geometry import LineString, Point, LinearRing, MultiPoint
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Tuple
 from pangocairohelpers.line_helper import coords_are_left_to_right
 from pangocairohelpers.line_helper import coords_length
 
@@ -159,3 +160,28 @@ def next_offset_from_offset_in_line_string(
             next_minimum_point_offset = point_offset
 
     return next_minimum_point_offset
+
+
+def angles_at_offsets(
+        line_string: LineString
+) -> List[Tuple[float, float]]:
+    """
+    :param line_string:
+        the ``LineString`` to read values from
+    :return:
+        a list of angle values, indexed by the offset within
+        the ``line_string``
+    """
+    angles = []
+    offsets = []
+    coords = line_string.coords
+    offset = 0
+    for i in range(len(coords) - 1):
+        coord_a = coords[i]
+        coord_b = coords[i + 1]
+        distance = math.hypot(coord_b[0] - coord_a[0], coord_b[1] - coord_a[1])
+        angle = math.atan2(coord_b[1] - coord_a[1], coord_b[0] - coord_a[0])
+        angles.append(angle)
+        offsets.append(offset)
+        offset += distance
+    return list(zip(offsets, angles))

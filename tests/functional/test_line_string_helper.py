@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import pytest
 from shapely.geometry import LineString, Point
 from pangocairohelpers import line_string_helper as helper
@@ -137,3 +139,40 @@ def test_next_offset_from_offset_in_line_string(
         assert next_offset is None
     else:
         assert next_offset == expected_next_offset
+
+
+test_angles_at_offsets_data = [
+    # Horizontal
+    (
+        LineString([[0, 0], [2, 0], [0, 0]]), [(0, 0), (2, math.pi)]
+    ),
+    # Vertical
+    (
+        LineString([[0, 0], [0, 2], [0, 0]]),
+        [(0, math.pi / 2), (2, -math.pi / 2)]
+    ),
+    # Diagonal
+    (
+        LineString([[0, 0], [1, 1], [0, 0]]),
+        [(0, math.pi / 4), (math.sqrt(2), -math.pi * 3 / 4)]
+    ),
+    # Multiple
+    (
+        LineString([[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]),
+        [(0, 0), (1, 0), (2, 0), (3, 0)]
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,expected_angles_at_offsets",
+    test_angles_at_offsets_data
+)
+def test_angles_at_offsets(
+        line_string: LineString,
+        expected_angles_at_offsets: List[Tuple[float, float]],
+):
+    angles_at_offsets = helper.angles_at_offsets(
+        line_string,
+    )
+    assert angles_at_offsets == expected_angles_at_offsets
