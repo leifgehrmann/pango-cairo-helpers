@@ -36,7 +36,7 @@ class TestTextPath(unittest.TestCase):
         layout = pangocairocffi.create_layout(cairo_context)
         layout.set_markup('Hi from Παν語')
 
-        line_string = LineString([[0, 0], [100, 0]])
+        line_string = LineString([[0, 0], [600, 0]])
         text_path = TextPath(line_string, layout)
         assert text_path.text_fits()
 
