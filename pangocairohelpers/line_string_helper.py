@@ -142,10 +142,10 @@ def next_offset_from_offset_in_line_string(
     """
     current_offset_point = line_string.interpolate(current_offset)
     points_at_distance = points_at_distance_from_point_on_line_string(
-            line_string,
-            current_offset_point,
-            distance
-        )
+        line_string,
+        current_offset_point,
+        distance
+    )
 
     next_minimum_point_offset = None
     for point in points_at_distance:
