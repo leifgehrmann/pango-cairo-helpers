@@ -7,7 +7,7 @@ from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
-from pangocairohelpers.text_path import TextPathGlyphItem
+from pangocairohelpers.text_path import TextPathGlyphItem, StandardLayoutEngine
 from pangocairohelpers import line_string_helper
 
 
@@ -36,6 +36,12 @@ class TextPath:
         self.line_string = line_string
         self.layout_clusters = LayoutClusters(self.layout)
         self.alignment = alignment
+        self.layout_engine = StandardLayoutEngine(
+            self.line_string,
+            self.layout_clusters,
+            self.alignment
+        )
+        self.text_path_glyph_items = None
 
     def text_fits(self) -> bool:
         # Todo: is this algorithm realistic?
@@ -116,39 +122,18 @@ class TextPath:
         )
         return rotation, new_offset
 
-    def get_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
-        # Todo: Make this function correct
-        glyph_items = self.layout_clusters.get_clusters()
-        logical_positions = self.layout_clusters.get_logical_extents()
-        text_path_glyph_items = []
-
-        line_string_offset = 0
-        glyph_items_data = zip(glyph_items, logical_positions)
-        for glyph_item, logical_position in glyph_items_data:
-            rotation, next_offset = \
-                self.get_rotation_and_next_offset_for_glyph_item(
-                    logical_position,
-                    line_string_offset
-                )
-            self._calculate_rotation_for_glyph_item_at_offset()
-            glyph_start_position = self.line_string.interpolate(
-                logical_position.x
-            )
-            text_path_glyph_item = TextPathGlyphItem(
-                glyph_item,
-                glyph_start_position,
-                0
-            )
-            text_path_glyph_items.append(text_path_glyph_item)
-            line_string_offset = next_offset
-        return text_path_glyph_items
+    def _compute_text_path_glyph_items(self):
+        if self.text_path_glyph_items is None:
+            self.text_path_glyph_items = self.layout_engine. \
+                generate_text_path_glyph_items()
+        return self.text_path_glyph_items
 
     def compute_boundaries(self) -> MultiPolygon:
         # Todo:
         pass
 
     def draw(self, context: Context):
-        text_path_glyph_items = self.get_text_path_glyph_items()
+        text_path_glyph_items = self._compute_text_path_glyph_items()
         for text_path_glyph_item in text_path_glyph_items:
             glyph_position = text_path_glyph_item.position
             glyph_rotation = text_path_glyph_item.rotation
