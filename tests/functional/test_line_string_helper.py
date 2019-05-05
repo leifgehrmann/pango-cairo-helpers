@@ -204,3 +204,11 @@ def test_angle_at_offset(
         offset
     )
     assert angle_at_offset == expected_angle
+
+
+def test_angle_at_offset_raises_error_on_invalid_offset():
+    with pytest.raises(ValueError):
+        helper.angle_at_offset(
+            [(0, 1), (1, 2), (3, 1)],
+            -1.34
+        )
