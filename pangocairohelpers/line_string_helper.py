@@ -1,9 +1,10 @@
 """
     Functions to help with Shapely's ``LineString`` class.
 """
+import math
 
 from shapely.geometry import LineString, Point, LinearRing, MultiPoint
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Tuple
 from pangocairohelpers.line_helper import coords_are_left_to_right
 from pangocairohelpers.line_helper import coords_length
 
@@ -141,10 +142,10 @@ def next_offset_from_offset_in_line_string(
     """
     current_offset_point = line_string.interpolate(current_offset)
     points_at_distance = points_at_distance_from_point_on_line_string(
-            line_string,
-            current_offset_point,
-            distance
-        )
+        line_string,
+        current_offset_point,
+        distance
+    )
 
     next_minimum_point_offset = None
     for point in points_at_distance:
@@ -159,3 +160,50 @@ def next_offset_from_offset_in_line_string(
             next_minimum_point_offset = point_offset
 
     return next_minimum_point_offset
+
+
+def angles_at_offsets(
+        line_string: LineString
+) -> List[Tuple[float, float]]:
+    """
+    :param line_string:
+        the ``LineString`` to read values from
+    :return:
+        a list of angle values, indexed by the offset within
+        the ``line_string``
+    """
+    angles = []
+    offsets = []
+    coords = line_string.coords
+    offset = 0
+    for i in range(len(coords) - 1):
+        coord_a = coords[i]
+        coord_b = coords[i + 1]
+        distance = math.hypot(coord_b[0] - coord_a[0], coord_b[1] - coord_a[1])
+        angle = math.atan2(coord_b[1] - coord_a[1], coord_b[0] - coord_a[0])
+        angles.append(angle)
+        offsets.append(offset)
+        offset += distance
+    return list(zip(offsets, angles))
+
+
+def angle_at_offset(
+        angles_at_offsets_list: List[Tuple[float, float]],
+        offset: float
+) -> float:
+    """
+    :param angles_at_offsets_list:
+        a list of angle values, indexed by the offset
+    :param offset:
+        the offset value to look for
+    :return:
+        the angle at a specific offset in the ``angles_at_offsets``
+    """
+    if offset < 0:
+        raise ValueError("offset cannot be less than 0")
+    for i in range(len(angles_at_offsets_list)):
+        angle_offset, angle = angles_at_offsets_list[i]
+        _, previous_angle = angles_at_offsets_list[i - 1]
+        if angle_offset > offset:
+            return previous_angle
+    return angles_at_offsets_list[-1][1]

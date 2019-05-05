@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import pytest
 from shapely.geometry import LineString, Point
 from pangocairohelpers import line_string_helper as helper
@@ -106,7 +108,7 @@ def test_points_at_distance_from_point_on_line_string_raises_value_error():
         )
 
 
-test_get_lrt_and_rtl_length_data = [
+test_next_offset_from_offset_in_line_string_data = [
     # Basic x-axis tests
     (LineString([[0, 0], [10, 0]]), 3, 1, 4),
     (LineString([[2, 0], [10, 0]]), 9, 1.5, None),
@@ -120,7 +122,7 @@ test_get_lrt_and_rtl_length_data = [
 
 @pytest.mark.parametrize(
     "line_string,current_offset,distance,expected_next_offset",
-    test_get_lrt_and_rtl_length_data
+    test_next_offset_from_offset_in_line_string_data
 )
 def test_next_offset_from_offset_in_line_string(
         line_string: LineString,
@@ -137,3 +139,76 @@ def test_next_offset_from_offset_in_line_string(
         assert next_offset is None
     else:
         assert next_offset == expected_next_offset
+
+
+test_angles_at_offsets_data = [
+    # Horizontal
+    (
+        LineString([[0, 0], [2, 0], [0, 0]]), [(0, 0), (2, math.pi)]
+    ),
+    # Vertical
+    (
+        LineString([[0, 0], [0, 2], [0, 0]]),
+        [(0, math.pi / 2), (2, -math.pi / 2)]
+    ),
+    # Diagonal
+    (
+        LineString([[0, 0], [1, 1], [0, 0]]),
+        [(0, math.pi / 4), (math.sqrt(2), -math.pi * 3 / 4)]
+    ),
+    # Multiple
+    (
+        LineString([[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]]),
+        [(0, 0), (1, 0), (2, 0), (3, 0)]
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,expected_angles_at_offsets",
+    test_angles_at_offsets_data
+)
+def test_angles_at_offsets(
+        line_string: LineString,
+        expected_angles_at_offsets: List[Tuple[float, float]],
+):
+    angles_at_offsets = helper.angles_at_offsets(
+        line_string,
+    )
+    assert angles_at_offsets == expected_angles_at_offsets
+
+
+test_angle_at_offset_data = [
+    ([(0, 0), (2, math.pi)], 0, 0),
+    ([(0, 0), (2, math.pi)], 1, 0),
+    ([(0, 0), (2, math.pi)], 2, math.pi),
+    ([(0, 0), (2, math.pi)], 3, math.pi),
+    ([(0, math.pi / 2), (2, -math.pi / 2)], 1, math.pi / 2),
+    ([(0, math.pi / 2), (2, -math.pi / 2)], 2, -math.pi / 2),
+    ([(0, 0), (1, 1), (2, 0), (3, 1)], 3, 1),
+    ([(0, 0), (1, 1), (2, 0), (3, 1)], 2.4223, 0),
+]
+
+
+@pytest.mark.parametrize(
+    "angles_at_offsets,offset,expected_angle",
+    test_angle_at_offset_data
+)
+def test_angle_at_offset(
+        angles_at_offsets: List[Tuple[float, float]],
+        offset: float,
+        expected_angle: float
+):
+    angle_at_offset = helper.angle_at_offset(
+        angles_at_offsets,
+        offset
+    )
+    assert angle_at_offset == expected_angle
+
+
+def test_angle_at_offset_raises_error_on_invalid_offset():
+    with pytest.raises(ValueError):
+        helper.angle_at_offset(
+            [(0, 1), (1, 2), (3, 1)],
+            -1.34
+        )
