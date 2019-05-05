@@ -1,7 +1,7 @@
 from pangocffi import Layout, GlyphItem, units_to_double
 from typing import List, Optional
 
-from shapely.geometry import Point
+from pangocairohelpers import GlyphExtents
 
 
 class LayoutClusters:
@@ -24,7 +24,7 @@ class LayoutClusters:
         self.layout = layout
         self.text = self.layout.get_text()
         self.clusters = []
-        self.logical_positions = []
+        self.logical_extents = []
         self._extract_properties_from_layout()
 
     def _extract_properties_from_layout(self):
@@ -52,8 +52,11 @@ class LayoutClusters:
                 cluster_extents = layout_cluster_iter.get_cluster_extents()[1]
                 layout_cluster_iter.next_cluster()
                 self.clusters.append(cluster)
-                self.logical_positions.append(Point(
+                self.logical_extents.append(GlyphExtents(
                     units_to_double(cluster_extents.x),
+                    units_to_double(cluster_extents.y),
+                    units_to_double(cluster_extents.width),
+                    units_to_double(cluster_extents.height),
                     units_to_double(layout_line_baseline)
                 ))
 
@@ -122,10 +125,9 @@ class LayoutClusters:
         """
         return self.clusters
 
-    def get_logical_positions(self) -> List[Point]:
+    def get_logical_extents(self) -> List[GlyphExtents]:
         """
         :return:
-            a list of ``Point`` representing the top left position of the
-            logical extent of each cluster in the layout
+            a list of ``GlyphExtents`` for each cluster in the layout
         """
-        return self.logical_positions
+        return self.logical_extents
