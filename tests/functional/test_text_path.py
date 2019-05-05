@@ -43,7 +43,7 @@ class TestTextPath(unittest.TestCase):
         debug.draw_line_string(cairo_context, line_string)
         cairo_context.stroke()
 
-        line_string = LineString([[10, 50], [20, 50], [23, 60], [25, 50], [50, 50], [90, 90]])
+        line_string = LineString([[10, 50], [50, 50], [90, 90]])
         text_path = TextPath(line_string, layout)
         text_path.draw(cairo_context)
 

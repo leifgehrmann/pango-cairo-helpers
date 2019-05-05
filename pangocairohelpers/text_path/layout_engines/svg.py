@@ -1,14 +1,15 @@
-from typing import List, Tuple
+import math
+from typing import List
 
 from pangocffi import Alignment
 from shapely.geometry import LineString
 
-from pangocairohelpers import LayoutClusters
+from pangocairohelpers import LayoutClusters, point_helper
 from pangocairohelpers import line_string_helper
 from pangocairohelpers.text_path import TextPathGlyphItem
 
 
-class StandardLayoutEngine:
+class Svg:
 
     def __init__(
             self,
@@ -37,21 +38,26 @@ class StandardLayoutEngine:
         glyph_items_and_extents = zip(glyph_items, extents)
         for glyph_item, extent in glyph_items_and_extents:
 
-            offset = self.start_offset + extent.x
+            glyph_width = extent.width
+            offset = self.start_offset + extent.x + glyph_width / 2
 
             # Cut off rendering the rest of the text if there no more space
             # to layout the text
             if line_string_length < offset:
                 break
 
-            position = self.line_string.interpolate(offset)
+            center_position = self.line_string.interpolate(offset)
             rotation = line_string_helper.angle_at_offset(
                 angles_at_offsets, offset
             )
 
+            left_position = point_helper.add_polar_vector(
+                center_position, rotation + math.pi, glyph_width / 2
+            )
+
             text_path_glyph_item = TextPathGlyphItem(
                 glyph_item,
-                position,
+                left_position,
                 rotation
             )
             text_path_glyph_items.append(text_path_glyph_item)

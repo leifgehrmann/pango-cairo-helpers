@@ -1,5 +1,5 @@
 import math
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 from cairocffi import Context
 from pangocffi import Layout, Alignment
@@ -7,7 +7,7 @@ from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
-from pangocairohelpers.text_path import TextPathGlyphItem, StandardLayoutEngine
+from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
 from pangocairohelpers import line_string_helper
 
 
@@ -36,7 +36,7 @@ class TextPath:
         self.line_string = line_string
         self.layout_clusters = LayoutClusters(self.layout)
         self.alignment = alignment
-        self.layout_engine = StandardLayoutEngine(
+        self.layout_engine = SvgLayoutEngine(
             self.line_string,
             self.layout_clusters,
             self.alignment
@@ -147,4 +147,3 @@ class TextPath:
                 text_path_glyph_item.glyph_item
             )
             context.restore()
-
