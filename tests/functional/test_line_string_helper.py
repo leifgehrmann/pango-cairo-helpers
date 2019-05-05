@@ -176,3 +176,31 @@ def test_angles_at_offsets(
         line_string,
     )
     assert angles_at_offsets == expected_angles_at_offsets
+
+
+test_angle_at_offset_data = [
+    ([(0, 0), (2, math.pi)], 0, 0),
+    ([(0, 0), (2, math.pi)], 1, 0),
+    ([(0, 0), (2, math.pi)], 2, math.pi),
+    ([(0, 0), (2, math.pi)], 3, math.pi),
+    ([(0, math.pi / 2), (2, -math.pi / 2)], 1, math.pi / 2),
+    ([(0, math.pi / 2), (2, -math.pi / 2)], 2, -math.pi / 2),
+    ([(0, 0), (1, 1), (2, 0), (3, 1)], 3, 1),
+    ([(0, 0), (1, 1), (2, 0), (3, 1)], 2.4223, 0),
+]
+
+
+@pytest.mark.parametrize(
+    "angles_at_offsets,offset,expected_angle",
+    test_angle_at_offset_data
+)
+def test_angle_at_offset(
+        angles_at_offsets: List[Tuple[float, float]],
+        offset: float,
+        expected_angle: float
+):
+    angle_at_offset = helper.angle_at_offset(
+        angles_at_offsets,
+        offset
+    )
+    assert angle_at_offset == expected_angle

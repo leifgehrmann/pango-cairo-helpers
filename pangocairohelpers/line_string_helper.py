@@ -185,3 +185,25 @@ def angles_at_offsets(
         offsets.append(offset)
         offset += distance
     return list(zip(offsets, angles))
+
+
+def angle_at_offset(
+        angles_at_offsets_list: List[Tuple[float, float]],
+        offset: float
+) -> float:
+    """
+    :param angles_at_offsets_list:
+        a list of angle values, indexed by the offset
+    :param offset:
+        the offset value to look for
+    :return:
+        the angle at a specific offset in the ``angles_at_offsets``
+    """
+    if offset < 0:
+        raise ValueError("offset cannot be less than 0")
+    for i in range(len(angles_at_offsets_list)):
+        angle_offset, angle = angles_at_offsets_list[i]
+        _, previous_angle = angles_at_offsets_list[i - 1]
+        if angle_offset > offset:
+            return previous_angle
+    return angles_at_offsets_list[-1][1]
