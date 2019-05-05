@@ -31,6 +31,28 @@ class TestTextPath(unittest.TestCase):
         with self.assertRaises(ValueError):
             TextPath(line_string, layout)
 
+    def test_text_fits(self):
+        surface, cairo_context = self._create_real_surface()
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[0, 0], [100, 0]])
+        text_path = TextPath(line_string, layout)
+        assert text_path.text_fits()
+
+        line_string = LineString([[0, 0], [50, 0]])
+        text_path = TextPath(line_string, layout)
+        assert not text_path.text_fits()
+
+    def test_compute_boundaries(self):
+        surface, cairo_context = self._create_real_surface()
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[0, 0], [100, 0]])
+        text_path = TextPath(line_string, layout)
+        assert text_path.compute_boundaries() is None
+
     def test_glyph(self):
         surface, cairo_context = self._create_real_surface()
         layout = pangocairocffi.create_layout(cairo_context)

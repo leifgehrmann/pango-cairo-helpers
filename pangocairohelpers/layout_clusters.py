@@ -1,8 +1,6 @@
 from pangocffi import Layout, GlyphItem, units_to_double
 from typing import List, Optional
 
-from shapely.geometry import Point
-
 from pangocairohelpers import GlyphExtents
 
 
