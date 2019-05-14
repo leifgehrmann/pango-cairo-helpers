@@ -4,6 +4,7 @@ from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
+from pangocairohelpers.text_path import Side
 from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
 
 
@@ -23,6 +24,7 @@ class TextPath:
             line_string: LineString,
             layout: Layout,
             alignment: Alignment = Alignment.LEFT,
+            side: Side = Side.LEFT,
             layout_engine=SvgLayoutEngine
     ):
         if layout.get_line_count() > 1:
@@ -33,6 +35,7 @@ class TextPath:
         self.line_string = line_string
         self.layout_clusters = LayoutClusters(self.layout)
         self.alignment = alignment
+        self.side = side
         self.layout_engine = layout_engine(
             self.line_string,
             self.layout_clusters,
