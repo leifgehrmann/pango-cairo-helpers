@@ -24,4 +24,4 @@ LineString Helper
 TextPath
 ________
 
-.. automodule:: pangocairohelpers.text_path
+.. autoclass:: pangocairohelpers.text_path.TextPath
