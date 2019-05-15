@@ -23,6 +23,7 @@ tests/output/*
 
 # Documentation
 /docs/_build
+/docs/pangocairohelpers.*.rst
 
 # Mac OS
 .DS_store
