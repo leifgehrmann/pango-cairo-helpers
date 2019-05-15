@@ -52,9 +52,10 @@ class TextPath:
         self.side = side
         self.layout_engine = layout_engine(
             self.line_string,
-            self.layout_clusters,
-            self.alignment
+            self.layout_clusters
         )
+        self.layout_engine.alignment = alignment
+        self.layout_engine.side = side
         self.text_path_glyph_items = None
 
     def text_fits(self) -> bool:

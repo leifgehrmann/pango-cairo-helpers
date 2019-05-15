@@ -6,7 +6,7 @@ from shapely.geometry import LineString
 
 from pangocairohelpers import LayoutClusters, point_helper
 from pangocairohelpers import line_string_helper
-from pangocairohelpers.text_path import TextPathGlyphItem
+from pangocairohelpers.text_path import TextPathGlyphItem, Side
 
 
 class Svg:
@@ -14,15 +14,37 @@ class Svg:
     def __init__(
             self,
             line_string: LineString,
-            layout_clusters: LayoutClusters,
-            alignment: Alignment = Alignment.LEFT
+            layout_clusters: LayoutClusters
     ):
         self.line_string = line_string
         self.layout_clusters = layout_clusters
-        self.alignment = alignment
-        self.start_offset = 0
+        self._alignment = Alignment.LEFT
+        self._side = Side.LEFT
+        self._start_offset = 0
 
-    # def _find_
+    @property
+    def alignment(self) -> Alignment:
+        return self._alignment
+
+    @alignment.setter
+    def alignment(self, value: Alignment):
+        self._alignment = value
+
+    @property
+    def side(self) -> Side:
+        return self._side
+
+    @side.setter
+    def side(self, value: Side):
+        self._side = value
+
+    @property
+    def start_offset(self) -> float:
+        return float(self._start_offset)
+
+    @start_offset.setter
+    def start_offset(self, value: float):
+        self._start_offset = float(value)
 
     def generate_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
         text_path_glyph_items = []
