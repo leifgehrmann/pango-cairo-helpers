@@ -5,7 +5,7 @@ import pangocairocffi
 from shapely.geometry import LineString
 import unittest
 
-from pangocairohelpers.text_path import TextPath
+from pangocairohelpers.text_path import TextPath, Side
 from . import debug
 
 
@@ -68,7 +68,7 @@ class TestTextPath(unittest.TestCase):
         cairo_context.stroke()
 
         line_string = LineString([[10, 50], [50, 50], [90, 90]])
-        text_path = TextPath(line_string, layout)
+        text_path = TextPath(line_string, layout, side=Side.RIGHT)
         text_path.draw(cairo_context)
 
         debug.draw_line_string(cairo_context, line_string)

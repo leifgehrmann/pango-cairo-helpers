@@ -50,6 +50,8 @@ class TextPath:
         self.layout_clusters = LayoutClusters(self.layout)
         self.alignment = alignment
         self.side = side
+        if side == Side.RIGHT:
+            self.line_string.coords = list(self.line_string.coords)[::-1]
         self.layout_engine = layout_engine(
             self.line_string,
             self.layout_clusters
