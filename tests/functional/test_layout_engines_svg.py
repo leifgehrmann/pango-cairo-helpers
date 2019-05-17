@@ -5,7 +5,6 @@ from pangocffi import Alignment
 from shapely.geometry import LineString
 
 from pangocairohelpers import LayoutClusters
-from pangocairohelpers.text_path import Side
 from pangocairohelpers.text_path.layout_engines import Svg
 
 
