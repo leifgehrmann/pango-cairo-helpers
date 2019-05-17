@@ -57,7 +57,6 @@ class TextPath:
             self.layout_clusters
         )
         self.layout_engine.alignment = alignment
-        self.layout_engine.side = side
         self.text_path_glyph_items = None
 
     def text_fits(self) -> bool:
