@@ -18,13 +18,10 @@ class TestLayoutEnginesSvg(unittest.TestCase):
             layout_cluster = LayoutClusters(None)
             layout_engine = Svg(line_string, layout_cluster)
             assert isinstance(layout_engine.alignment, Alignment)
-            assert isinstance(layout_engine.side, Side)
             assert isinstance(layout_engine.start_offset, float)
 
             layout_engine.alignment = Alignment.CENTER
-            layout_engine.side = Side.RIGHT
             layout_engine.start_offset = 3.14
 
             assert layout_engine.alignment == Alignment.CENTER
-            assert layout_engine.side == Side.RIGHT
             assert layout_engine.start_offset == 3.14
