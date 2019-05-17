@@ -20,3 +20,8 @@ LineString Helper
 -----------------
 
 .. automodule:: pangocairohelpers.line_string_helper
+
+TextPath
+________
+
+.. autoclass:: pangocairohelpers.text_path.TextPath

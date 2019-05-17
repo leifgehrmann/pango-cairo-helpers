@@ -4,6 +4,7 @@ from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
+from pangocairohelpers.text_path import Side
 from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
 
 
@@ -23,8 +24,23 @@ class TextPath:
             line_string: LineString,
             layout: Layout,
             alignment: Alignment = Alignment.LEFT,
+            side: Side = Side.LEFT,
             layout_engine=SvgLayoutEngine
     ):
+        """
+        :param line_string:
+            a ``LineString`` for the text to follow
+        :param layout:
+            the layout to apply to the ``line_string``
+        :param alignment:
+            whether the text should be left, center, or right aligned
+        :param side:
+            what side the text should use. For example, for a line going
+            left to right horizontally, the text will appear upright if the
+            side is "left". If it's "right", the text will appear upside down.
+        :param layout_engine:
+            The layout engine to use when positioning and orientating the text
+        """
         if layout.get_line_count() > 1:
             raise ValueError('layout cannot be more than one line.')
 
@@ -33,11 +49,14 @@ class TextPath:
         self.line_string = line_string
         self.layout_clusters = LayoutClusters(self.layout)
         self.alignment = alignment
+        self.side = side
+        if side == Side.RIGHT:
+            self.line_string.coords = list(self.line_string.coords)[::-1]
         self.layout_engine = layout_engine(
             self.line_string,
-            self.layout_clusters,
-            self.alignment
+            self.layout_clusters
         )
+        self.layout_engine.alignment = alignment
         self.text_path_glyph_items = None
 
     def text_fits(self) -> bool:
@@ -57,6 +76,12 @@ class TextPath:
         return self.text_path_glyph_items
 
     def compute_boundaries(self) -> MultiPolygon:
+        """
+        Computes the combined glyph extents for the text path
+
+        :return:
+            a union of glyph extents
+        """
         # Todo:
         pass
 

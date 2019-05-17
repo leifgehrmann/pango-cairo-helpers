@@ -14,15 +14,28 @@ class Svg:
     def __init__(
             self,
             line_string: LineString,
-            layout_clusters: LayoutClusters,
-            alignment: Alignment = Alignment.LEFT
+            layout_clusters: LayoutClusters
     ):
         self.line_string = line_string
         self.layout_clusters = layout_clusters
-        self.alignment = alignment
-        self.start_offset = 0
+        self._alignment = Alignment.LEFT
+        self._start_offset = 0
 
-    # def _find_
+    @property
+    def alignment(self) -> Alignment:
+        return self._alignment
+
+    @alignment.setter
+    def alignment(self, value: Alignment):
+        self._alignment = value
+
+    @property
+    def start_offset(self) -> float:
+        return float(self._start_offset)
+
+    @start_offset.setter
+    def start_offset(self, value: float):
+        self._start_offset = float(value)
 
     def generate_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
         text_path_glyph_items = []

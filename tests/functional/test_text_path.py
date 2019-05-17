@@ -5,7 +5,7 @@ import pangocairocffi
 from shapely.geometry import LineString
 import unittest
 
-from pangocairohelpers.text_path import TextPath
+from pangocairohelpers.text_path import TextPath, Side
 from . import debug
 
 
@@ -16,8 +16,8 @@ class TestTextPath(unittest.TestCase):
         cairo_context = Context(surface)
         return surface, cairo_context
 
-    def _create_real_surface(self) -> Tuple[Surface, Context]:
-        surface = SVGSurface('tests/output/test.svg', 100, 100)
+    def _create_real_surface(self, filename: str) -> Tuple[Surface, Context]:
+        surface = SVGSurface('tests/output/text_path_%s' % filename, 100, 100)
         cairo_context = Context(surface)
         return surface, cairo_context
 
@@ -32,7 +32,7 @@ class TestTextPath(unittest.TestCase):
             TextPath(line_string, layout)
 
     def test_text_fits(self):
-        surface, cairo_context = self._create_real_surface()
+        surface, cairo_context = self._create_real_surface('text_fits.svg')
         layout = pangocairocffi.create_layout(cairo_context)
         layout.set_markup('Hi from Παν語')
 
@@ -45,7 +45,9 @@ class TestTextPath(unittest.TestCase):
         assert not text_path.text_fits()
 
     def test_compute_boundaries(self):
-        surface, cairo_context = self._create_real_surface()
+        surface, cairo_context = self._create_real_surface(
+            'compute_boundaries.svg'
+        )
         layout = pangocairocffi.create_layout(cairo_context)
         layout.set_markup('Hi from Παν語')
 
@@ -53,8 +55,8 @@ class TestTextPath(unittest.TestCase):
         text_path = TextPath(line_string, layout)
         assert text_path.compute_boundaries() is None
 
-    def test_glyph(self):
-        surface, cairo_context = self._create_real_surface()
+    def test_draw(self):
+        surface, cairo_context = self._create_real_surface('draw.svg')
         layout = pangocairocffi.create_layout(cairo_context)
         layout.set_markup('Hi from Παν語')
 
@@ -66,7 +68,7 @@ class TestTextPath(unittest.TestCase):
         cairo_context.stroke()
 
         line_string = LineString([[10, 50], [50, 50], [90, 90]])
-        text_path = TextPath(line_string, layout)
+        text_path = TextPath(line_string, layout, side=Side.RIGHT)
         text_path.draw(cairo_context)
 
         debug.draw_line_string(cairo_context, line_string)
