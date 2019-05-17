@@ -1,10 +1,11 @@
 import math
+from operator import attrgetter
 from typing import List
 
 from pangocffi import Alignment
 from shapely.geometry import LineString
 
-from pangocairohelpers import LayoutClusters, point_helper
+from pangocairohelpers import LayoutClusters, point_helper, GlyphExtents
 from pangocairohelpers import line_string_helper
 from pangocairohelpers.text_path import TextPathGlyphItem
 
@@ -36,6 +37,24 @@ class Svg:
     @start_offset.setter
     def start_offset(self, value: float):
         self._start_offset = float(value)
+
+    def get_max_x_extent_in_layout_cluster(self) -> GlyphExtents:
+        extents = self.layout_clusters.get_logical_extents()
+        return max(extents, key=attrgetter('x'))
+
+    def get_left_aligned_start_offset(self) -> float:
+        return self.start_offset
+
+    def get_center_aligned_start_offset(self) -> float:
+        pass
+
+    def get_right_aligned_start_offset(self) -> float:
+        max_layout_cluster_x_extent = self.get_max_x_extent_in_layout_cluster()
+        max_x = max_layout_cluster_x_extent.x + \
+            max_layout_cluster_x_extent.width
+        if max_x > self.line_string.length:
+            return self.start_offset
+        return self.line_string.length - max_x
 
     def generate_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
         text_path_glyph_items = []
