@@ -100,7 +100,8 @@ class TestTextPath(unittest.TestCase):
         cairo_context.stroke()
 
         line_string = translate(line_string, 0, 20)
-        text_path = TextPath(line_string, layout, side=Side.RIGHT)
+        text_path = TextPath(line_string, layout)
+        text_path.side = Side.RIGHT
         text_path.draw(cairo_context)
 
         debug.draw_line_string(cairo_context, line_string)
@@ -116,14 +117,16 @@ class TestTextPath(unittest.TestCase):
         layout.set_markup('Hi from Παν語')
 
         line_string = LineString([[10, 30], [90, 30]])
-        text_path = TextPath(line_string, layout, alignment=Alignment.CENTER)
+        text_path = TextPath(line_string, layout)
+        text_path.alignment = Alignment.CENTER
         text_path.draw(cairo_context)
         debug.draw_line_string(cairo_context, line_string)
 
         cairo_context.stroke()
 
         line_string = translate(line_string, 0, 25)
-        text_path = TextPath(line_string, layout, alignment=Alignment.RIGHT)
+        text_path = TextPath(line_string, layout)
+        text_path.alignment = Alignment.RIGHT
         text_path.draw(cairo_context)
         debug.draw_line_string(cairo_context, line_string)
 
@@ -159,12 +162,9 @@ class TestTextPath(unittest.TestCase):
                     0
                 )
 
-                text_path = TextPath(
-                    line_string,
-                    layout,
-                    alignment=alignment,
-                    start_offset=start_offset
-                )
+                text_path = TextPath(line_string, layout)
+                text_path.alignment = alignment
+                text_path.start_offset = start_offset
                 cairo_context.set_source_rgb(0, 0, 0)
                 text_path.draw(cairo_context)
 

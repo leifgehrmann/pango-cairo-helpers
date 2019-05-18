@@ -7,35 +7,17 @@ from shapely.geometry import LineString
 from pangocairohelpers import LayoutClusters, point_helper
 from pangocairohelpers import line_string_helper
 from pangocairohelpers.text_path import TextPathGlyphItem
+from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
 
 
-class Svg:
+class Svg(LayoutEngineAbstract):
 
     def __init__(
             self,
             line_string: LineString,
             layout_clusters: LayoutClusters
     ):
-        self.line_string = line_string
-        self.layout_clusters = layout_clusters
-        self._alignment = Alignment.LEFT
-        self._start_offset = 0
-
-    @property
-    def alignment(self) -> Alignment:
-        return self._alignment
-
-    @alignment.setter
-    def alignment(self, value: Alignment):
-        self._alignment = value
-
-    @property
-    def start_offset(self) -> float:
-        return float(self._start_offset)
-
-    @start_offset.setter
-    def start_offset(self, value: float):
-        self._start_offset = float(value)
+        super().__init__(line_string, layout_clusters)
 
     def _get_aligned_start_offset(self) -> float:
         """
