@@ -94,11 +94,12 @@ class Svg:
             if line_string_length < offset:
                 break
 
-            center_position = self.line_string.interpolate(offset)
-
-            # Todo: hack
+            # Cut off rendering the beginning of the text if there is no
+            # space to layout the text
             if offset <= 0:
                 continue
+
+            center_position = self.line_string.interpolate(offset)
 
             rotation = line_string_helper.angle_at_offset(
                 angles_at_offsets, offset
