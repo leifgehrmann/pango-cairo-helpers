@@ -151,7 +151,7 @@ class LayoutClusters:
         """
         return self.logical_extents
 
-    def get_max_logical_extents(self) -> Optional[Extent]:
+    def get_max_logical_extent(self) -> Optional[Extent]:
         """
         :return:
             the extent of the layout itself
