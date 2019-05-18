@@ -1,7 +1,7 @@
 from pangocffi import Layout, GlyphItem, units_to_double
 from typing import List, Optional
 
-from pangocairohelpers import GlyphExtents
+from pangocairohelpers import GlyphExtent, Extent
 
 
 class LayoutClusters:
@@ -25,15 +25,20 @@ class LayoutClusters:
         self.text = self.layout.get_text()
         self.clusters = []
         self.logical_extents = []
-        self._extract_properties_from_layout()
+        self.max_logical_extent = None
+        self._extract_logical_extents_from_layout()
+        self._extract_max_logical_extent()
 
-    def _extract_properties_from_layout(self):
+    def _extract_logical_extents_from_layout(self):
         """
-        Iterates over each cluster
+        Iterates over each cluster and extracts the logical extents for each
+        one.
+        """
 
-        Todo: This function uses two different iterators.
-        This probably could do with a bit of refactoring
-        """
+        # Note: two iterators are used, one to iterate over each LayoutRun, and
+        # another to iterate over each GlyphItem cluster.
+        # This probably could do with a bit of refactoring, but this is
+        # currently how Pango works right now.
         layout_run_iter = self.layout.get_iter()
         layout_cluster_iter = self.layout.get_iter()
 
@@ -49,18 +54,32 @@ class LayoutClusters:
 
             clusters = self._get_clusters_from_glyph_item(layout_run)
             for cluster in clusters:
-                cluster_extents = layout_cluster_iter.get_cluster_extents()[1]
+                __, cluster_logical_extent = layout_cluster_iter.\
+                    get_cluster_extents()
                 layout_cluster_iter.next_cluster()
                 self.clusters.append(cluster)
-                self.logical_extents.append(GlyphExtents(
-                    units_to_double(cluster_extents.x),
-                    units_to_double(cluster_extents.y),
-                    units_to_double(cluster_extents.width),
-                    units_to_double(cluster_extents.height),
+                self.logical_extents.append(GlyphExtent(
+                    units_to_double(cluster_logical_extent.x),
+                    units_to_double(cluster_logical_extent.y),
+                    units_to_double(cluster_logical_extent.width),
+                    units_to_double(cluster_logical_extent.height),
                     units_to_double(layout_line_baseline)
                 ))
 
             has_next_run = layout_run_iter.next_run()
+
+    def _extract_max_logical_extent(self):
+        """
+        Extracts the extents of all the clusters (which is essentially the
+        layout extents)
+        """
+        __, layout_logical_extent = self.layout.get_extents()
+        self.max_logical_extent = Extent(
+            units_to_double(layout_logical_extent.x),
+            units_to_double(layout_logical_extent.y),
+            units_to_double(layout_logical_extent.width),
+            units_to_double(layout_logical_extent.height)
+        )
 
     def _split_glyph_item_at_first_cluster(
             self,
@@ -125,9 +144,16 @@ class LayoutClusters:
         """
         return self.clusters
 
-    def get_logical_extents(self) -> List[GlyphExtents]:
+    def get_logical_extents(self) -> List[GlyphExtent]:
         """
         :return:
-            a list of ``GlyphExtents`` for each cluster in the layout
+            a list of ``GlyphExtent`` for each cluster in the layout
         """
         return self.logical_extents
+
+    def get_max_logical_extent(self) -> Optional[Extent]:
+        """
+        :return:
+            the extent of the layout itself
+        """
+        return self.max_logical_extent

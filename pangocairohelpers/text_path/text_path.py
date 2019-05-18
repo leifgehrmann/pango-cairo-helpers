@@ -25,6 +25,7 @@ class TextPath:
             layout: Layout,
             alignment: Alignment = Alignment.LEFT,
             side: Side = Side.LEFT,
+            start_offset: float = 0,
             layout_engine=SvgLayoutEngine
     ):
         """
@@ -54,9 +55,10 @@ class TextPath:
             self.line_string.coords = list(self.line_string.coords)[::-1]
         self.layout_engine = layout_engine(
             self.line_string,
-            self.layout_clusters
+            self.layout_clusters,
         )
         self.layout_engine.alignment = alignment
+        self.layout_engine.start_offset = start_offset
         self.text_path_glyph_items = None
 
     def text_fits(self) -> bool:
