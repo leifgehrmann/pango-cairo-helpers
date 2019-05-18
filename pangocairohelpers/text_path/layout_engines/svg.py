@@ -5,7 +5,7 @@ from typing import List
 from pangocffi import Alignment
 from shapely.geometry import LineString
 
-from pangocairohelpers import LayoutClusters, point_helper, GlyphExtents
+from pangocairohelpers import LayoutClusters, point_helper, GlyphExtent
 from pangocairohelpers import line_string_helper
 from pangocairohelpers.text_path import TextPathGlyphItem
 
@@ -38,7 +38,7 @@ class Svg:
     def start_offset(self, value: float):
         self._start_offset = float(value)
 
-    def get_max_x_extent_in_layout_cluster(self) -> GlyphExtents:
+    def get_max_x_extent_in_layout_cluster(self) -> GlyphExtent:
         extents = self.layout_clusters.get_logical_extents()
         return max(extents, key=attrgetter('x'))
 

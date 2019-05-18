@@ -1,7 +1,7 @@
 from pangocffi import Layout, GlyphItem, units_to_double
 from typing import List, Optional
 
-from pangocairohelpers import GlyphExtents
+from pangocairohelpers import GlyphExtent
 
 
 class LayoutClusters:
@@ -52,7 +52,7 @@ class LayoutClusters:
                 cluster_extents = layout_cluster_iter.get_cluster_extents()[1]
                 layout_cluster_iter.next_cluster()
                 self.clusters.append(cluster)
-                self.logical_extents.append(GlyphExtents(
+                self.logical_extents.append(GlyphExtent(
                     units_to_double(cluster_extents.x),
                     units_to_double(cluster_extents.y),
                     units_to_double(cluster_extents.width),
@@ -125,9 +125,9 @@ class LayoutClusters:
         """
         return self.clusters
 
-    def get_logical_extents(self) -> List[GlyphExtents]:
+    def get_logical_extents(self) -> List[GlyphExtent]:
         """
         :return:
-            a list of ``GlyphExtents`` for each cluster in the layout
+            a list of ``GlyphExtent`` for each cluster in the layout
         """
         return self.logical_extents

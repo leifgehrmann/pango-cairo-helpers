@@ -1,4 +1,5 @@
-from .glyph_extents import GlyphExtents  # noqa
+from .extent import Extent  # noqa
+from .glyph_extent import GlyphExtent  # noqa
 from . import point_helper  # noqa
 from . import line_helper  # noqa
 from . import line_string_helper  # noqa
