@@ -8,6 +8,7 @@ from shapely.geometry import LineString
 import unittest
 
 from pangocairohelpers.text_path import TextPath, Side
+from pangocairohelpers.text_path.layout_engines import Svg
 from . import debug
 
 
@@ -31,6 +32,20 @@ class TestTextPath(unittest.TestCase):
         )
         cairo_context = Context(surface)
         return surface, cairo_context
+
+    def test_setters_getters(self):
+        surface, cairo_context = self._create_void_surface()
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[0, 0], [600, 0]])
+        text_path = TextPath(line_string, layout)
+
+        assert isinstance(text_path.side, Side)
+        assert isinstance(text_path.alignment, Alignment)
+        assert isinstance(text_path.start_offset, float)
+
+        text_path.layout_engine_class(Svg)
 
     def test_error_is_raised_for_multi_line(self):
         surface, cairo_context = self._create_void_surface()
