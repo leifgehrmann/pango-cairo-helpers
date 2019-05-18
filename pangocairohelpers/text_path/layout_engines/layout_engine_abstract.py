@@ -8,8 +8,7 @@ from pangocairohelpers import LayoutClusters
 from pangocairohelpers.text_path import TextPathGlyphItem
 
 
-class LayoutEngineAbstract:
-    __metaclass__ = ABCMeta
+class LayoutEngineAbstract(object, metaclass=ABCMeta):
 
     def __init__(
             self,
@@ -39,4 +38,4 @@ class LayoutEngineAbstract:
 
     @abstractmethod
     def generate_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
-        pass
+        pass  # pragma: no cover
