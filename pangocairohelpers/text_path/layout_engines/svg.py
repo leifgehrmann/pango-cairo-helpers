@@ -1,11 +1,10 @@
 import math
-from operator import attrgetter
 from typing import List
 
 from pangocffi import Alignment
 from shapely.geometry import LineString
 
-from pangocairohelpers import LayoutClusters, point_helper, GlyphExtent
+from pangocairohelpers import LayoutClusters, point_helper
 from pangocairohelpers import line_string_helper
 from pangocairohelpers.text_path import TextPathGlyphItem
 
@@ -38,23 +37,38 @@ class Svg:
     def start_offset(self, value: float):
         self._start_offset = float(value)
 
-    def get_max_x_extent_in_layout_cluster(self) -> GlyphExtent:
-        extents = self.layout_clusters.get_logical_extents()
-        return max(extents, key=attrgetter('x'))
+    def _get_aligned_start_offset(self) -> float:
+        """
+        :return:
+            the offset along the line_string where the first character should
+            begin.
+        """
+        if self._alignment == Alignment.CENTER:
+            return self._get_center_aligned_start_offset()
+        if self._alignment == Alignment.RIGHT:
+            return self._get_right_aligned_start_offset()
+        # Default to left
+        return self._get_left_aligned_start_offset()
 
-    def get_left_aligned_start_offset(self) -> float:
+    def _get_left_aligned_start_offset(self) -> float:
+        # Todo: This assumes we don't allow clipping of text at the beginning
         return self.start_offset
 
-    def get_center_aligned_start_offset(self) -> float:
-        pass
+    def _get_center_aligned_start_offset(self) -> float:
+        layout_extent = self.layout_clusters.get_max_logical_extent()
+        # Todo: This assumes we don't allow clipping of text at the beginning
+        if layout_extent.width > self.line_string.length:
+            return self._get_left_aligned_start_offset()
+        return (self.line_string.length - layout_extent.width) / 2 + \
+            self.start_offset
 
-    def get_right_aligned_start_offset(self) -> float:
-        max_layout_cluster_x_extent = self.get_max_x_extent_in_layout_cluster()
-        max_x = max_layout_cluster_x_extent.x + \
-            max_layout_cluster_x_extent.width
-        if max_x > self.line_string.length:
-            return self.start_offset
-        return self.line_string.length - max_x
+    def _get_right_aligned_start_offset(self) -> float:
+        layout_extent = self.layout_clusters.get_max_logical_extent()
+        # Todo: This assumes we don't allow clipping of text at the beginning
+        if layout_extent.width > self.line_string.length:
+            return self._get_left_aligned_start_offset()
+        return self.line_string.length - layout_extent.width + \
+            self.start_offset
 
     def generate_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
         text_path_glyph_items = []
@@ -65,13 +79,15 @@ class Svg:
 
         line_string_length = self.line_string.length
 
+        alignment_start_offset = self._get_aligned_start_offset()
+
         glyph_items = self.layout_clusters.get_clusters()
         extents = self.layout_clusters.get_logical_extents()
         glyph_items_and_extents = zip(glyph_items, extents)
         for glyph_item, extent in glyph_items_and_extents:
 
             glyph_width = extent.width
-            offset = self.start_offset + extent.x + glyph_width / 2
+            offset = alignment_start_offset + extent.x + glyph_width / 2
 
             # Cut off rendering the rest of the text if there no more space
             # to layout the text
@@ -79,6 +95,11 @@ class Svg:
                 break
 
             center_position = self.line_string.interpolate(offset)
+
+            # Todo: hack
+            if offset <= 0:
+                continue
+
             rotation = line_string_helper.angle_at_offset(
                 angles_at_offsets, offset
             )
