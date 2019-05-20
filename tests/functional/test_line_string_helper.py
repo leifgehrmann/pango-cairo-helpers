@@ -148,7 +148,7 @@ test_angles_at_offsets_data = [
     ),
     # Vertical
     (
-        LineString([[0, 0], [0, 2], [0, 0]]).parallel_offset(),
+        LineString([[0, 0], [0, 2], [0, 0]]),
         [(0, math.pi / 2), (2, -math.pi / 2)]
     ),
     # Diagonal
