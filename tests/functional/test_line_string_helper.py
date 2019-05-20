@@ -215,7 +215,7 @@ def test_angle_at_offset_raises_error_on_invalid_offset():
 
 
 test_parallel_offset_with_matching_direction_data = [
-    (LineString([[10, 10], [10, 20]]), 10, LineString([[0, 0], [0, 0]])),
+    (LineString([[10, 10], [10, 20]]), 10, LineString([[0, 10], [0, 20]])),
     (LineString([[10, 10], [20, 10]]), 10, LineString([[0, 0], [0, 0]])),
     (LineString([[10, 10], [10, 0]]), 10, LineString([[0, 0], [0, 0]])),
     (LineString([[10, 10], [0, 10]]), 10, LineString([[0, 0], [0, 0]])),
