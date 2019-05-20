@@ -210,18 +210,18 @@ def angle_at_offset(
     return angles_at_offsets_list[-1][1]
 
 
-def parallel_offset_with_matching_direction(
-        line_string: LineString,
-        distance: float,
-        side: str = Side.RIGHT,
-        resolution: int = 16,
-        join_style: int = JOIN_STYLE.round,
-        mitre_limit: float = 5
-) -> Optional[LineString]:
-    return line_string.parallel_offset(
-        distance,
-        side=side,
-        resolution=resolution,
-        join_style=join_style,
-        mitre_limit=mitre_limit
-    )
+# def parallel_offset_with_matching_direction(
+#         line_string: LineString,
+#         distance: float,
+#         side: str = Side.RIGHT,
+#         resolution: int = 16,
+#         join_style: int = JOIN_STYLE.round,
+#         mitre_limit: float = 5
+# ) -> Optional[LineString]:
+#     return line_string.parallel_offset(
+#         distance,
+#         side=side,
+#         resolution=resolution,
+#         join_style=join_style,
+#         mitre_limit=mitre_limit
+#     )
