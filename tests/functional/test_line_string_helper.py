@@ -148,7 +148,7 @@ test_angles_at_offsets_data = [
     ),
     # Vertical
     (
-        LineString([[0, 0], [0, 2], [0, 0]]),
+        LineString([[0, 0], [0, 2], [0, 0]]).parallel_offset(),
         [(0, math.pi / 2), (2, -math.pi / 2)]
     ),
     # Diagonal
@@ -212,3 +212,26 @@ def test_angle_at_offset_raises_error_on_invalid_offset():
             [(0, 1), (1, 2), (3, 1)],
             -1.34
         )
+
+
+test_parallel_offset_with_matching_direction_data = [
+    (LineString([[10, 10], [10, 20]]), 10, LineString([[0, 0], [0, 0]])),
+    (LineString([[10, 10], [20, 10]]), 10, LineString([[0, 0], [0, 0]])),
+    (LineString([[10, 10], [10, 0]]), 10, LineString([[0, 0], [0, 0]])),
+    (LineString([[10, 10], [0, 10]]), 10, LineString([[0, 0], [0, 0]])),
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,distance,expected_output",
+    test_parallel_offset_with_matching_direction_data
+)
+def test_parallel_offset_with_matching_direction(
+        line_string: LineString,
+        distance: float,
+        expected_output: LineString
+):
+    assert helper.parallel_offset_with_matching_direction(
+        line_string,
+        distance
+    ).coords == expected_output.coords
