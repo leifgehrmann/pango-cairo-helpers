@@ -3,11 +3,13 @@
 """
 import math
 
-from shapely.geometry import LineString, Point, LinearRing, MultiPoint, JOIN_STYLE
+from shapely.geometry import LineString, Point, LinearRing, MultiPoint, \
+    JOIN_STYLE
 from typing import Dict, Optional, List, Tuple
+
+from pangocairohelpers import Side
 from pangocairohelpers.line_helper import coords_are_left_to_right
 from pangocairohelpers.line_helper import coords_length
-from pangocairohelpers.text_path import Side
 
 
 def _directional_length(
@@ -210,18 +212,25 @@ def angle_at_offset(
     return angles_at_offsets_list[-1][1]
 
 
-# def parallel_offset_with_matching_direction(
-#         line_string: LineString,
-#         distance: float,
-#         side: str = Side.RIGHT,
-#         resolution: int = 16,
-#         join_style: int = JOIN_STYLE.round,
-#         mitre_limit: float = 5
-# ) -> Optional[LineString]:
-#     return line_string.parallel_offset(
-#         distance,
-#         side=side,
-#         resolution=resolution,
-#         join_style=join_style,
-#         mitre_limit=mitre_limit
-#     )
+def reverse(line_string: LineString) -> LineString:
+    return LineString(list(line_string.coords)[::-1])
+
+
+def parallel_offset_with_matching_direction(
+        line_string: LineString,
+        distance: float,
+        side: Side = Side.RIGHT,
+        resolution: int = 16,
+        join_style: int = JOIN_STYLE.round,
+        mitre_limit: float = 5,
+        is_flipped: bool = True
+) -> Optional[LineString]:
+    if is_flipped:
+        side = side.flipped
+    return line_string.parallel_offset(
+        distance,
+        side=side.value,
+        resolution=resolution,
+        join_style=join_style,
+        mitre_limit=mitre_limit
+    )

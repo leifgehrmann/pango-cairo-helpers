@@ -6,7 +6,7 @@ from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
-from pangocairohelpers.text_path import Side
+from pangocairohelpers import Side
 from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
 from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
 

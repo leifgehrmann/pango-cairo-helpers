@@ -1,8 +1,8 @@
 from typing import List, Tuple
 
 import pytest
-from shapely.geometry import LineString, Point
-from pangocairohelpers import line_string_helper as helper
+from shapely.geometry import LineString, Point, JOIN_STYLE
+from pangocairohelpers import line_string_helper as helper, Side
 import math
 
 
@@ -214,25 +214,103 @@ def test_angle_at_offset_raises_error_on_invalid_offset():
         )
 
 
-# test_parallel_offset_with_matching_direction_data = [
-#     (LineString([[10, 10], [10, 20]]), 10, LineString([[0, 10], [0, 20]])),
-#     (LineString([[10, 10], [20, 10]]), 10, LineString([[0, 0], [0, 0]])),
-#     (LineString([[10, 10], [10, 0]]), 10, LineString([[0, 0], [0, 0]])),
-#     (LineString([[10, 10], [0, 10]]), 10, LineString([[0, 0], [0, 0]])),
-# ]
-#
-#
-# @pytest.mark.parametrize(
-#     "line_string,distance,expected_output",
-#     test_parallel_offset_with_matching_direction_data
-# )
-# def test_parallel_offset_with_matching_direction(
-#         line_string: LineString,
-#         distance: float,
-#         expected_output: LineString
-# ):
-#     pass
-#     # assert helper.parallel_offset_with_matching_direction(
-#     #     line_string,
-#     #     distance
-#     # ).coords == expected_output.coords
+test_reverse_data = [
+    (
+        LineString([[0, 0], [10, 10], [20, 0]]),
+        LineString([[20, 0], [10, 10], [0, 0]])
+    )
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,expected_output",
+    test_reverse_data
+)
+def test_reverse(line_string: LineString, expected_output: LineString):
+    output = helper.reverse(line_string)
+    assert list(expected_output.coords) == list(output.coords)
+
+
+test_parallel_offset_with_matching_direction_data = [
+    (
+        LineString([[10, 10], [20, 10]]),
+        10,
+        Side.LEFT,
+        LineString([[10, 0], [20, 0]])
+    ),
+    (
+        LineString([[10, 10], [10, 20]]),
+        10,
+        Side.LEFT,
+        LineString([[20, 10], [20, 20]])
+    ),
+    (
+        LineString([[10, 10], [0, 10]]),
+        10,
+        Side.LEFT,
+        LineString([[10, 20], [0, 20]])
+    ),
+    (
+        LineString([[10, 10], [10, 0]]),
+        10,
+        Side.LEFT,
+        LineString([[0, 10], [0, 0]])
+    ),
+    (
+        LineString([[0, 0], [10, 0], [10, 20]]),
+        10,
+        Side.RIGHT,
+        LineString([[0, 10], [0, 20]])
+    ),
+    (
+        LineString([[10, 20], [20, 20], [20, 0], [0, 0]]),
+        10,
+        Side.RIGHT,
+        LineString([[10, 30], [30, 30], [30, -10], [0, -10]])
+    ),
+    (
+        LineString([[0, 0], [40, 0], [40, 30], [10, 30], [10, 10], [0, 10]]),
+        10,
+        Side.RIGHT,
+        LineString([[20, 10], [30, 10], [30, 20], [20, 20], [20, 10]])
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,distance,side,expected_output",
+    test_parallel_offset_with_matching_direction_data
+)
+def test_parallel_offset_with_matching_direction(
+        line_string: LineString,
+        distance: float,
+        side: Side,
+        expected_output: LineString
+):
+    offset_line_string = helper.parallel_offset_with_matching_direction(
+        line_string,
+        distance,
+        side=side,
+        join_style=JOIN_STYLE.mitre,
+        is_flipped=True
+    )
+    # Todo: Remove "any" direction requirement.
+    assert list(offset_line_string.coords) == list(expected_output.coords) or \
+        list(helper.reverse(offset_line_string).coords) == \
+        list(expected_output.coords)
+
+    # Now assert the inverse direction
+    line_string = helper.reverse(line_string)
+    expected_output = helper.reverse(expected_output)
+    offset_line_string = helper.parallel_offset_with_matching_direction(
+        line_string,
+        distance,
+        side=side.flipped,
+        join_style=JOIN_STYLE.mitre,
+        is_flipped=True
+    )
+
+    # Todo: Remove "any" direction requirement.
+    assert list(offset_line_string.coords) == list(expected_output.coords) or \
+        list(helper.reverse(offset_line_string).coords) == \
+        list(expected_output.coords)
