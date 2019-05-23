@@ -227,10 +227,37 @@ def parallel_offset_with_matching_direction(
 ) -> Optional[LineString]:
     if is_flipped:
         side = side.flipped
-    return line_string.parallel_offset(
+    result = line_string.parallel_offset(
         distance,
         side=side.value,
         resolution=resolution,
         join_style=join_style,
         mitre_limit=mitre_limit
     )
+
+    reverse_result = reverse(result)
+
+    _, aao_i = angles_at_offsets(line_string)[0]
+    _, aao_o = angles_at_offsets(result)[0]
+    _, aao_or = angles_at_offsets(reverse_result)[0]
+
+    # Todo: If position is [distance] away, and is going in that same
+    #       direction, use that value.
+
+    # Todo: If the reverse of the line matches the criteria above, use the
+    #       reversed value.
+
+    i_o = min(
+        abs(aao_i - aao_o),
+        abs(aao_i - aao_o + 2 * math.pi),
+        abs(aao_i - aao_o - 2 * math.pi)
+    )
+    i_or = min(
+        abs(aao_i - aao_or),
+        abs(aao_i - aao_or + 2 * math.pi),
+        abs(aao_i - aao_or - 2 * math.pi)
+    )
+
+    if abs(i_o) > abs(i_or):
+        return reverse_result
+    return result
