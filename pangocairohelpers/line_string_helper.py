@@ -277,9 +277,10 @@ def parallel_offset_with_matching_direction(
         return result, True
 
     # Is the start position of the reverse output line similar to the input
-    # line?
-    if position_diff_end == distance:
-        return result_reverse, True
+    # line? Note: This actually never happens, and I couldn't generate a test
+    # case for it, so it has been left out.
+    # if position_diff_end == distance:
+    #     return result_reverse, True
 
     # Give up, there is no other precise way to know exactly what the correct
     # direction should be.
