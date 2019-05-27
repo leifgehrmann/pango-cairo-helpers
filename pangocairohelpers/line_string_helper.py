@@ -235,6 +235,12 @@ def parallel_offset_with_matching_direction(
         mitre_limit=mitre_limit
     )
 
+    if not isinstance(result, LineString):
+        return result, False
+
+    if result.is_empty:
+        return result, False
+
     result_reverse = reverse(result)
 
     input_position_start = line_string.coords[0]

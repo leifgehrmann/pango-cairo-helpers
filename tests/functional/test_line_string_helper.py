@@ -335,3 +335,24 @@ def test_parallel_offset_with_matching_direction(
                or \
                list(helper.reverse(offset_line_string).coords) == \
                list(expected_output.coords)
+
+
+def test_parallel_offset_with_matching_direction_empty():
+    line_string = LineString([
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, 1],
+    ])
+    distance = 1
+
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=Side.RIGHT,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
+
+    assert offset_line_string.is_empty and correct_direction is False
