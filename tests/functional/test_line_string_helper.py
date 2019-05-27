@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 import pytest
-from shapely.geometry import LineString, Point, JOIN_STYLE
+from shapely.geometry import LineString, Point, JOIN_STYLE, MultiLineString
 from pangocairohelpers import line_string_helper as helper, Side
 import math
 
@@ -356,3 +356,28 @@ def test_parallel_offset_with_matching_direction_empty():
         )
 
     assert offset_line_string.is_empty and correct_direction is False
+
+
+def test_parallel_offset_with_matching_direction_multi_linear_ring():
+    line_string = LineString([
+        [0, 0],
+        [2, 0],
+        [1.2, 1],
+        [2, 2],
+        [0, 2],
+        [0.8, 1],
+        [0, 0],
+    ])
+    distance = 0.2
+
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=Side.RIGHT,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
+
+    assert isinstance(offset_line_string, MultiLineString) and \
+        correct_direction is False
