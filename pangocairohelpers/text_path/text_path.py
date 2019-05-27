@@ -47,10 +47,8 @@ class TextPath:
         self._side = Side.LEFT
 
         self._layout_clusters = LayoutClusters(self._layout)
-        self._layout_engine = SvgLayoutEngine(
-            self._line_string,
-            self._layout_clusters
-        )
+        self._layout_engine_class = SvgLayoutEngine
+        self._layout_engine = None
 
         self._text_path_glyph_items = None
 
@@ -85,7 +83,6 @@ class TextPath:
             Defaults to ``'Left'``
         """
         self._alignment = value
-        self._update_layout_engine()
 
     @property
     def start_offset(self) -> float:
@@ -101,23 +98,21 @@ class TextPath:
             Defaults to ``0``
         """
         self._start_offset = float(value)
-        self._update_layout_engine()
 
-    def layout_engine_class(self, layout_engine_class: Type[LayoutEngine]):
+    @property
+    def layout_engine_class(self) -> Type[LayoutEngine]:
+        return self._layout_engine_class
+
+    @layout_engine_class.setter
+    def layout_engine_class(self, value: Type[LayoutEngine]):
         """
-        :param layout_engine_class:
+        :param value:
             The layout engine class to use when positioning and orientating the
             text.
-        """
-        self._layout_engine = layout_engine_class(
-            self._line_string,
-            self._layout_clusters
-        )
-        self._update_layout_engine()
 
-    def _update_layout_engine(self):
-        self._layout_engine.alignment = self._alignment
-        self._layout_engine.start_offset = self._start_offset
+            Defaults to ``SvgLayoutEngine``
+        """
+        self._layout_engine_class = value
 
     def text_fits(self) -> bool:
         """
@@ -129,7 +124,22 @@ class TextPath:
         number_of_total_glyphs = len(self._layout_clusters.get_clusters())
         return number_of_layed_out_glyphs == number_of_total_glyphs
 
+    def _generate_layout_engine(self):
+        if not isinstance(self._layout_engine, self._layout_engine_class) or \
+                self._layout_engine is None:
+            self._layout_engine = self.layout_engine_class(
+                self._line_string,
+                self._layout_clusters
+            )
+
+        if self._layout_engine.alignment != self._alignment:
+            self._layout_engine.alignment = self._alignment
+
+        if self._layout_engine.start_offset != self._start_offset:
+            self._layout_engine.start_offset = self._start_offset
+
     def _compute_text_path_glyph_items(self):
+        self._generate_layout_engine()
         if self._text_path_glyph_items is None:
             self._text_path_glyph_items = self._layout_engine. \
                 generate_text_path_glyph_items()
