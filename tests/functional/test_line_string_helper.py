@@ -236,83 +236,102 @@ test_parallel_offset_with_matching_direction_data = [
         LineString([[10, 10], [20, 10]]),
         10,
         Side.LEFT,
-        LineString([[10, 0], [20, 0]])
+        LineString([[10, 0], [20, 0]]),
+        True
     ),
     (
         LineString([[10, 10], [10, 20]]),
         10,
         Side.LEFT,
-        LineString([[20, 10], [20, 20]])
+        LineString([[20, 10], [20, 20]]),
+        True
     ),
     (
         LineString([[10, 10], [0, 10]]),
         10,
         Side.LEFT,
-        LineString([[10, 20], [0, 20]])
+        LineString([[10, 20], [0, 20]]),
+        True
     ),
     (
         LineString([[10, 10], [10, 0]]),
         10,
         Side.LEFT,
-        LineString([[0, 10], [0, 0]])
+        LineString([[0, 10], [0, 0]]),
+        True
     ),
-    # (
-    #     LineString([[0, 0], [10, 0], [10, 20]]),
-    #     10,
-    #     Side.RIGHT,
-    #     LineString([[0, 10], [0, 20]])
-    # ),
-    # (
-    #     LineString([[10, 20], [20, 20], [20, 0], [0, 0]]),
-    #     10,
-    #     Side.RIGHT,
-    #     LineString([[10, 30], [30, 30], [30, -10], [0, -10]])
-    # ),
-    # (
-    #     LineString([[0, 0], [40, 0], [40, 30], [10, 30], [10, 10], [0, 10]]),
-    #     10,
-    #     Side.RIGHT,
-    #     LineString([[20, 10], [30, 10], [30, 20], [20, 20], [20, 10]])
-    # ),
+    (
+        LineString([[0, 0], [10, 0], [10, 20]]),
+        10,
+        Side.RIGHT,
+        LineString([[0, 10], [0, 20]]),
+        True
+    ),
+    (
+        LineString([[10, 20], [20, 20], [20, 0], [0, 0]]),
+        10,
+        Side.RIGHT,
+        LineString([[10, 30], [30, 30], [30, -10], [0, -10]]),
+        True
+    ),
+    (
+        LineString([[0, 0], [40, 0], [40, 30], [10, 30], [10, 10], [0, 10]]),
+        10,
+        Side.RIGHT,
+        LineString([[20, 10], [30, 10], [30, 20], [20, 20], [20, 10]]),
+        False
+    ),
 ]
 
 
 @pytest.mark.parametrize(
-    "line_string,distance,side,expected_output",
+    "line_string,distance,side,expected_output,expected_correct_direction",
     test_parallel_offset_with_matching_direction_data
 )
 def test_parallel_offset_with_matching_direction(
         line_string: LineString,
         distance: float,
         side: Side,
-        expected_output: LineString
+        expected_output: LineString,
+        expected_correct_direction: bool
 ):
-    offset_line_string = helper.parallel_offset_with_matching_direction(
-        line_string,
-        distance,
-        side=side,
-        join_style=JOIN_STYLE.mitre,
-        is_flipped=True
-    )
-    # Todo: Remove "any" direction requirement.
-    assert list(offset_line_string.coords) == list(expected_output.coords) \
-        # or \
-        # list(helper.reverse(offset_line_string).coords) == \
-        # list(expected_output.coords)
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=side,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
+    
+    assert expected_correct_direction is correct_direction
+
+    if correct_direction is True:
+        assert list(offset_line_string.coords) == list(expected_output.coords)
+    else:
+        assert list(offset_line_string.coords) == list(expected_output.coords)\
+         or \
+         list(helper.reverse(offset_line_string).coords) == \
+         list(expected_output.coords)
 
     # Now assert the inverse direction
     line_string = helper.reverse(line_string)
     expected_output = helper.reverse(expected_output)
-    offset_line_string = helper.parallel_offset_with_matching_direction(
-        line_string,
-        distance,
-        side=side.flipped,
-        join_style=JOIN_STYLE.mitre,
-        is_flipped=True
-    )
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=side.flipped,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
 
-    # Todo: Remove "any" direction requirement.
-    assert list(offset_line_string.coords) == list(expected_output.coords) \
-        # or \
-        # list(helper.reverse(offset_line_string).coords) == \
-        # list(expected_output.coords)
+    assert expected_correct_direction is correct_direction
+
+    if correct_direction is True:
+        assert list(offset_line_string.coords) == list(expected_output.coords)
+    else:
+        assert list(offset_line_string.coords) == list(expected_output.coords)\
+               or \
+               list(helper.reverse(offset_line_string).coords) == \
+               list(expected_output.coords)

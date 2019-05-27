@@ -224,7 +224,7 @@ def parallel_offset_with_matching_direction(
         join_style: int = JOIN_STYLE.round,
         mitre_limit: float = 5,
         is_flipped: bool = True
-) -> Optional[LineString]:
+) -> Tuple[Optional[LineString], bool]:
     if is_flipped:
         side = side.flipped
     result = line_string.parallel_offset(
@@ -235,29 +235,46 @@ def parallel_offset_with_matching_direction(
         mitre_limit=mitre_limit
     )
 
-    reverse_result = reverse(result)
+    result_reverse = reverse(result)
 
-    _, aao_i = angles_at_offsets(line_string)[0]
-    _, aao_o = angles_at_offsets(result)[0]
-    _, aao_or = angles_at_offsets(reverse_result)[0]
+    input_position_start = line_string.coords[0]
+    output_position_start = result.coords[0]
+    output_position_end = result_reverse.coords[0]
 
-    # Todo: If position is [distance] away, and is going in that same
-    #       direction, use that value.
-
-    # Todo: If the reverse of the line matches the criteria above, use the
-    #       reversed value.
-
-    i_o = min(
-        abs(aao_i - aao_o),
-        abs(aao_i - aao_o + 2 * math.pi),
-        abs(aao_i - aao_o - 2 * math.pi)
+    position_diff_start = coords_length(
+        input_position_start,
+        output_position_start
     )
-    i_or = min(
-        abs(aao_i - aao_or),
-        abs(aao_i - aao_or + 2 * math.pi),
-        abs(aao_i - aao_or - 2 * math.pi)
+    position_diff_end = coords_length(
+        input_position_start,
+        output_position_end
     )
 
-    if abs(i_o) > abs(i_or):
-        return reverse_result
-    return result
+    _, input_angle_start = angles_at_offsets(line_string)[0]
+    _, output_angle_start = angles_at_offsets(result)[0]
+    _, output_angle_end = angles_at_offsets(result_reverse)[0]
+
+    # Is the start position and angle of the output line similar to the input
+    # line?
+    if position_diff_start == distance and \
+       output_angle_start == input_angle_start:
+        return result, True
+
+    # Is the start position and angle of the reverse output line similar to the
+    # input line?
+    if position_diff_end == distance and \
+       output_angle_end == input_angle_start:
+        return result_reverse, True
+
+    # Is the start position of the output line similar to the input line?
+    if position_diff_start == distance:
+        return result, True
+
+    # Is the start position of the reverse output line similar to the input
+    # line?
+    if position_diff_end == distance:
+        return result_reverse, True
+
+    # Give up, there is no other precise way to know exactly what the correct
+    # direction should be.
+    return result, False
