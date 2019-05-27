@@ -3,8 +3,11 @@
 """
 import math
 
-from shapely.geometry import LineString, Point, LinearRing, MultiPoint
+from shapely.geometry import LineString, Point, LinearRing, MultiPoint, \
+    JOIN_STYLE
 from typing import Dict, Optional, List, Tuple
+
+from pangocairohelpers import Side
 from pangocairohelpers.line_helper import coords_are_left_to_right
 from pangocairohelpers.line_helper import coords_length
 
@@ -207,3 +210,78 @@ def angle_at_offset(
         if angle_offset > offset:
             return previous_angle
     return angles_at_offsets_list[-1][1]
+
+
+def reverse(line_string: LineString) -> LineString:
+    return LineString(list(line_string.coords)[::-1])
+
+
+def parallel_offset_with_matching_direction(
+        line_string: LineString,
+        distance: float,
+        side: Side = Side.RIGHT,
+        resolution: int = 16,
+        join_style: int = JOIN_STYLE.round,
+        mitre_limit: float = 5,
+        is_flipped: bool = True
+) -> Tuple[Optional[LineString], bool]:
+    if is_flipped:
+        side = side.flipped
+    result = line_string.parallel_offset(
+        distance,
+        side=side.value,
+        resolution=resolution,
+        join_style=join_style,
+        mitre_limit=mitre_limit
+    )
+
+    if not isinstance(result, LineString):
+        return result, False
+
+    if result.is_empty:
+        return result, False
+
+    result_reverse = reverse(result)
+
+    input_position_start = line_string.coords[0]
+    output_position_start = result.coords[0]
+    output_position_end = result_reverse.coords[0]
+
+    position_diff_start = coords_length(
+        input_position_start,
+        output_position_start
+    )
+    position_diff_end = coords_length(
+        input_position_start,
+        output_position_end
+    )
+
+    _, input_angle_start = angles_at_offsets(line_string)[0]
+    _, output_angle_start = angles_at_offsets(result)[0]
+    _, output_angle_end = angles_at_offsets(result_reverse)[0]
+
+    # Is the start position and angle of the output line similar to the input
+    # line?
+    if position_diff_start == distance and \
+       output_angle_start == input_angle_start:
+        return result, True
+
+    # Is the start position and angle of the reverse output line similar to the
+    # input line?
+    if position_diff_end == distance and \
+       output_angle_end == input_angle_start:
+        return result_reverse, True
+
+    # Is the start position of the output line similar to the input line?
+    if position_diff_start == distance:
+        return result, True
+
+    # Is the start position of the reverse output line similar to the input
+    # line? Note: This actually never happens, and I couldn't generate a test
+    # case for it, so it has been left out.
+    # if position_diff_end == distance:
+    #     return result_reverse, True
+
+    # Give up, there is no other precise way to know exactly what the correct
+    # direction should be.
+    return result, False

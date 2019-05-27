@@ -1,8 +1,8 @@
 from typing import List, Tuple
 
 import pytest
-from shapely.geometry import LineString, Point
-from pangocairohelpers import line_string_helper as helper
+from shapely.geometry import LineString, Point, JOIN_STYLE, MultiLineString
+from pangocairohelpers import line_string_helper as helper, Side
 import math
 
 
@@ -212,3 +212,172 @@ def test_angle_at_offset_raises_error_on_invalid_offset():
             [(0, 1), (1, 2), (3, 1)],
             -1.34
         )
+
+
+test_reverse_data = [
+    (
+        LineString([[0, 0], [10, 10], [20, 0]]),
+        LineString([[20, 0], [10, 10], [0, 0]])
+    )
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,expected_output",
+    test_reverse_data
+)
+def test_reverse(line_string: LineString, expected_output: LineString):
+    output = helper.reverse(line_string)
+    assert list(expected_output.coords) == list(output.coords)
+
+
+test_parallel_offset_with_matching_direction_data = [
+    (
+        LineString([[10, 10], [20, 10]]),
+        10,
+        Side.LEFT,
+        LineString([[10, 0], [20, 0]]),
+        True
+    ),
+    (
+        LineString([[10, 10], [10, 20]]),
+        10,
+        Side.LEFT,
+        LineString([[20, 10], [20, 20]]),
+        True
+    ),
+    (
+        LineString([[10, 10], [0, 10]]),
+        10,
+        Side.LEFT,
+        LineString([[10, 20], [0, 20]]),
+        True
+    ),
+    (
+        LineString([[10, 10], [10, 0]]),
+        10,
+        Side.LEFT,
+        LineString([[0, 10], [0, 0]]),
+        True
+    ),
+    (
+        LineString([[0, 0], [10, 0], [10, 20]]),
+        10,
+        Side.RIGHT,
+        LineString([[0, 10], [0, 20]]),
+        True
+    ),
+    (
+        LineString([[10, 20], [20, 20], [20, 0], [0, 0]]),
+        10,
+        Side.RIGHT,
+        LineString([[10, 30], [30, 30], [30, -10], [0, -10]]),
+        True
+    ),
+    (
+        LineString([[0, 0], [40, 0], [40, 30], [10, 30], [10, 10], [0, 10]]),
+        10,
+        Side.RIGHT,
+        LineString([[20, 10], [30, 10], [30, 20], [20, 20], [20, 10]]),
+        False
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,distance,side,expected_output,expected_correct_direction",
+    test_parallel_offset_with_matching_direction_data
+)
+def test_parallel_offset_with_matching_direction(
+        line_string: LineString,
+        distance: float,
+        side: Side,
+        expected_output: LineString,
+        expected_correct_direction: bool
+):
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=side,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
+
+    assert expected_correct_direction is correct_direction
+
+    if correct_direction is True:
+        assert list(offset_line_string.coords) == list(expected_output.coords)
+    else:
+        assert list(offset_line_string.coords) == list(expected_output.coords)\
+         or \
+         list(helper.reverse(offset_line_string).coords) == \
+         list(expected_output.coords)
+
+    # Now assert the inverse direction
+    line_string = helper.reverse(line_string)
+    expected_output = helper.reverse(expected_output)
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=side.flipped,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
+
+    assert expected_correct_direction is correct_direction
+
+    if correct_direction is True:
+        assert list(offset_line_string.coords) == list(expected_output.coords)
+    else:
+        assert list(offset_line_string.coords) == list(expected_output.coords)\
+               or \
+               list(helper.reverse(offset_line_string).coords) == \
+               list(expected_output.coords)
+
+
+def test_parallel_offset_with_matching_direction_empty():
+    line_string = LineString([
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, 1],
+    ])
+    distance = 1
+
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=Side.RIGHT,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
+
+    assert offset_line_string.is_empty and correct_direction is False
+
+
+def test_parallel_offset_with_matching_direction_multi_linear_ring():
+    line_string = LineString([
+        [0, 0],
+        [2, 0],
+        [1.2, 1],
+        [2, 2],
+        [0, 2],
+        [0.8, 1],
+        [0, 0],
+    ])
+    distance = 0.2
+
+    offset_line_string, correct_direction = helper.\
+        parallel_offset_with_matching_direction(
+            line_string,
+            distance,
+            side=Side.RIGHT,
+            join_style=JOIN_STYLE.mitre,
+            is_flipped=True
+        )
+
+    assert isinstance(offset_line_string, MultiLineString) and \
+        correct_direction is False

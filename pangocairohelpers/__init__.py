@@ -1,3 +1,4 @@
+from .side import Side  # noqa
 from .extent import Extent  # noqa
 from .glyph_extent import GlyphExtent  # noqa
 from . import point_helper  # noqa
