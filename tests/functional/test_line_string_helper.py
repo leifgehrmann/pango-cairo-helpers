@@ -303,7 +303,7 @@ def test_parallel_offset_with_matching_direction(
             join_style=JOIN_STYLE.mitre,
             is_flipped=True
         )
-    
+
     assert expected_correct_direction is correct_direction
 
     if correct_direction is True:
