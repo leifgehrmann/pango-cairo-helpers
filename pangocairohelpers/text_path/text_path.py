@@ -7,6 +7,7 @@ from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
 from pangocairohelpers import Side
+from pangocairohelpers.line_string_helper import reverse
 from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
 from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
 
@@ -40,7 +41,7 @@ class TextPath:
 
         self._layout = layout
         self._layout_text = layout.get_text()
-        self._line_string = line_string
+        self._input_line_string = line_string
 
         self._alignment = Alignment.LEFT
         self._start_offset = 0
@@ -66,8 +67,6 @@ class TextPath:
 
             Defaults to ``'Left'``
         """
-        if value != Side and value == Side.RIGHT:
-            self._line_string.coords = list(self._line_string.coords)[::-1]
         self._side = value
 
     @property
@@ -124,11 +123,18 @@ class TextPath:
         number_of_total_glyphs = len(self._layout_clusters.get_clusters())
         return number_of_layed_out_glyphs == number_of_total_glyphs
 
+    def _generate_modified_line_string(self):
+        self._modified_line_string = self._input_line_string
+        if self._side == Side.RIGHT:
+            self._modified_line_string = reverse(self._modified_line_string)
+
     def _generate_layout_engine(self):
+        self._generate_modified_line_string()
+
         if not isinstance(self._layout_engine, self._layout_engine_class) or \
                 self._layout_engine is None:
             self._layout_engine = self.layout_engine_class(
-                self._line_string,
+                self._modified_line_string,
                 self._layout_clusters
             )
 
