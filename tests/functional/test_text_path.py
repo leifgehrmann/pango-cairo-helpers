@@ -46,7 +46,7 @@ class TestTextPath(unittest.TestCase):
         assert isinstance(text_path.alignment, Alignment)
         assert isinstance(text_path.start_offset, float)
 
-        text_path.layout_engine_class(Svg)
+        text_path.layout_engine_class = Svg
 
     def test_error_is_raised_for_multi_line(self):
         surface, cairo_context = self._create_void_surface()
