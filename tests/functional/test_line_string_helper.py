@@ -281,6 +281,17 @@ test_parallel_offset_with_matching_direction_data = [
         LineString([[20, 10], [30, 10], [30, 20], [20, 20], [20, 10]]),
         False
     ),
+    (
+        LineString([[10, 50], [50, 50], [90, 90]]),
+        -10.0,
+        Side.RIGHT,
+        LineString([
+            [10, 40],
+            [54.14213562373096, 40],
+            [97.07106781186548, 82.92893218813452]
+        ]),
+        True
+    )
 ]
 
 

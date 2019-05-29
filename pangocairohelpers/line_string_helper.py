@@ -262,18 +262,18 @@ def parallel_offset_with_matching_direction(
 
     # Is the start position and angle of the output line similar to the input
     # line?
-    if position_diff_start == distance and \
+    if position_diff_start == abs(distance) and \
        output_angle_start == input_angle_start:
         return result, True
 
     # Is the start position and angle of the reverse output line similar to the
     # input line?
-    if position_diff_end == distance and \
+    if position_diff_end == abs(distance) and \
        output_angle_end == input_angle_start:
         return result_reverse, True
 
     # Is the start position of the output line similar to the input line?
-    if position_diff_start == distance:
+    if position_diff_start == abs(distance):
         return result, True
 
     # Is the start position of the reverse output line similar to the input

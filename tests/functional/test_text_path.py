@@ -8,6 +8,8 @@ from shapely.geometry import LineString
 import unittest
 
 from pangocairohelpers import Side
+from pangocairohelpers.line_string_helper import \
+    parallel_offset_with_matching_direction
 from pangocairohelpers.text_path import TextPath
 from pangocairohelpers.text_path.layout_engines import Svg
 from . import debug
@@ -45,6 +47,17 @@ class TestTextPath(unittest.TestCase):
         assert isinstance(text_path.side, Side)
         assert isinstance(text_path.alignment, Alignment)
         assert isinstance(text_path.start_offset, float)
+        assert isinstance(text_path.vertical_offset, float)
+
+        text_path.side = Side.RIGHT
+        text_path.alignment = Alignment.RIGHT
+        text_path.start_offset = 12
+        text_path.vertical_offset = 34
+
+        assert isinstance(text_path.side, Side)
+        assert isinstance(text_path.alignment, Alignment)
+        assert isinstance(text_path.start_offset, float)
+        assert isinstance(text_path.vertical_offset, float)
 
         text_path.layout_engine_class = Svg
 
@@ -189,3 +202,55 @@ class TestTextPath(unittest.TestCase):
                 cairo_context.stroke()
 
         surface.finish()
+
+    def test_vertical_offset_works(self):
+        surface, cairo_context = self._create_real_surface(
+            'vertical_offset_works.svg'
+        )
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[5, 40], [45, 40], [90, 80]])
+
+        for vertical_offset in [-13, 0, 13]:
+            offset_linestring, _ = parallel_offset_with_matching_direction(
+                line_string,
+                vertical_offset,
+                side=Side.LEFT
+            )
+            debug.draw_line_string(cairo_context, offset_linestring)
+            red = max(0.0, vertical_offset / 13)
+            green = max(0.0, -vertical_offset / 13)
+            cairo_context.set_source_rgba(red, green, 0, 0.2)
+            cairo_context.stroke()
+
+            text_path = TextPath(line_string, layout)
+            text_path.vertical_offset = vertical_offset
+            cairo_context.set_source_rgb(red, green, 0)
+            text_path.draw(cairo_context)
+
+        surface.finish()
+
+    def test_vertical_offset_fails_on_uncertain_direction(self):
+        surface, cairo_context = self._create_void_surface()
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[0, 0], [1, 0], [0, 1]])
+        text_path = TextPath(line_string, layout)
+        text_path.vertical_offset = -10
+
+        with self.assertRaises(RuntimeError):
+            text_path.draw(cairo_context)
+
+    def test_vertical_offset_fails_on_invalid_offset_shape(self):
+        surface, cairo_context = self._create_void_surface()
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[0, 0], [40, 0], [40, 40], [0, 40], [0, 0]])
+        text_path = TextPath(line_string, layout)
+        text_path.vertical_offset = -10
+
+        with self.assertRaises(RuntimeError):
+            text_path.draw(cairo_context)
