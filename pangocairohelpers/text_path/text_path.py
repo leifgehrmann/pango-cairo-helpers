@@ -149,7 +149,8 @@ class TextPath:
             self._modified_line_string, matched_direction = \
                 parallel_offset_with_matching_direction(
                     self._modified_line_string,
-                    self._vertical_offset
+                    self._vertical_offset,
+                    side=Side.LEFT
                 )
 
             if not isinstance(self._modified_line_string, LineString):

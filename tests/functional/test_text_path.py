@@ -214,15 +214,42 @@ class TestTextPath(unittest.TestCase):
         for vertical_offset in [-13, 0, 13]:
             offset_linestring, _ = parallel_offset_with_matching_direction(
                 line_string,
-                vertical_offset
+                vertical_offset,
+                side=Side.LEFT
             )
             debug.draw_line_string(cairo_context, offset_linestring)
-            cairo_context.set_source_rgba(0, 0, 0, 0.2)
+            red = max(0.0, vertical_offset / 13)
+            green = max(0.0, -vertical_offset / 13)
+            cairo_context.set_source_rgba(red, green, 0, 0.2)
             cairo_context.stroke()
 
             text_path = TextPath(line_string, layout)
             text_path.vertical_offset = vertical_offset
-            cairo_context.set_source_rgb(0, 0, 0)
+            cairo_context.set_source_rgb(red, green, 0)
             text_path.draw(cairo_context)
 
         surface.finish()
+
+    def test_vertical_offset_fails_on_uncertain_direction(self):
+        surface, cairo_context = self._create_void_surface()
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[0, 0], [1, 0], [0, 1]])
+        text_path = TextPath(line_string, layout)
+        text_path.vertical_offset = -10
+
+        with self.assertRaises(RuntimeError):
+            text_path.draw(cairo_context)
+
+    def test_vertical_offset_fails_on_invalid_offset_shape(self):
+        surface, cairo_context = self._create_void_surface()
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[0, 0], [40, 0], [40, 40], [0, 40], [0, 0]])
+        text_path = TextPath(line_string, layout)
+        text_path.vertical_offset = -10
+
+        with self.assertRaises(RuntimeError):
+            text_path.draw(cairo_context)
