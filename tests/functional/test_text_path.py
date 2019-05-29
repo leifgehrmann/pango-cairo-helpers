@@ -8,7 +8,8 @@ from shapely.geometry import LineString
 import unittest
 
 from pangocairohelpers import Side
-from pangocairohelpers.line_string_helper import parallel_offset_with_matching_direction
+from pangocairohelpers.line_string_helper import \
+    parallel_offset_with_matching_direction
 from pangocairohelpers.text_path import TextPath
 from pangocairohelpers.text_path.layout_engines import Svg
 from . import debug

@@ -7,7 +7,8 @@ from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
 from pangocairohelpers import Side
-from pangocairohelpers.line_string_helper import reverse, parallel_offset_with_matching_direction
+from pangocairohelpers.line_string_helper import reverse, \
+    parallel_offset_with_matching_direction
 from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
 from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
 
@@ -153,7 +154,8 @@ class TextPath:
                     side=Side.LEFT
                 )
 
-            if not isinstance(self._modified_line_string, LineString):
+            if not isinstance(self._modified_line_string, LineString) or \
+                    self._modified_line_string.is_empty:
                 self._modified_line_string = None
                 raise RuntimeError("Failed to offset linestring. "
                                    "Non-linestring object returned.")
