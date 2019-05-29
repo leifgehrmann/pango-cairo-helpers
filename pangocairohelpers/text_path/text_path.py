@@ -1,21 +1,15 @@
-from typing import TypeVar, Type
-
 from cairocffi import Context
-from pangocffi import Layout, Alignment
+from pangocffi import Layout
 from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
-from pangocairohelpers import LayoutClusters
 from pangocairohelpers import Side
 from pangocairohelpers.line_string_helper import reverse, \
     parallel_offset_with_matching_direction
-from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
-from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
-
-LayoutEngine = TypeVar('LayoutEngine', bound=LayoutEngineAbstract)
+from pangocairohelpers.text_path import TextPathAbstract
 
 
-class TextPath:
+class TextPath(TextPathAbstract):
     """
     Renders text similar to the behaviour found in SVG's ``<textPath>``.
 
@@ -37,99 +31,7 @@ class TextPath:
         :param layout:
             the layout to apply to the ``line_string``
         """
-        if layout.get_line_count() > 1:
-            raise ValueError('layout cannot be more than one line.')
-
-        self._layout = layout
-        self._layout_text = layout.get_text()
-        self._input_line_string = line_string
-
-        self._alignment = Alignment.LEFT
-        self._start_offset = 0
-        self._vertical_offset = 0
-        self._side = Side.LEFT
-
-        self._layout_clusters = LayoutClusters(self._layout)
-        self._layout_engine_class = SvgLayoutEngine
-        self._layout_engine = None
-
-        self._text_path_glyph_items = None
-
-    @property
-    def side(self) -> Side:
-        return self._side
-
-    @side.setter
-    def side(self, value: Side):
-        """
-        :param value:
-            what side the text should use. For example, for a line going
-            left to right horizontally, the text will appear upright if the
-            side is "left". If it's "right", the text will appear upside down.
-
-            Defaults to ``'Left'``
-        """
-        self._side = value
-
-    @property
-    def alignment(self) -> Alignment:
-        return self._alignment
-
-    @alignment.setter
-    def alignment(self, value: Alignment):
-        """
-        :param value:
-            whether the text should be left, center, or right aligned
-
-            Defaults to ``'Left'``
-        """
-        self._alignment = value
-
-    @property
-    def start_offset(self) -> float:
-        return float(self._start_offset)
-
-    @start_offset.setter
-    def start_offset(self, value: float):
-        """
-        :param value:
-            How far along the ``line_string`` the beginning character should be
-            offset.
-
-            Defaults to ``0``
-        """
-        self._start_offset = float(value)
-
-    @property
-    def vertical_offset(self) -> float:
-        return float(self._vertical_offset)
-
-    @vertical_offset.setter
-    def vertical_offset(self, value: float):
-        """
-        :param value:
-            How many units the text should be offset vertically from the
-            ``line_string``. If the line self_intersects, expect for the text
-            path to not render at all.
-
-            Defaults to ``0``
-        """
-        self._vertical_offset = float(value)
-
-    @property
-    def layout_engine_class(self) -> Type[LayoutEngine]:
-        return self._layout_engine_class
-
-    @layout_engine_class.setter
-    def layout_engine_class(self, value: Type[LayoutEngine]):
-        """
-        :param value:
-            The layout engine class to use when positioning and orientating the
-            text.
-
-            Defaults to ``SvgLayoutEngine``
-        """
-        self._layout_engine_class = value
+        super().__init__(line_string, layout)
 
     def text_fits(self) -> bool:
         """
