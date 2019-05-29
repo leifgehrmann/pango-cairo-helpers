@@ -7,7 +7,7 @@ from pangocairocffi.render_functions import show_glyph_item
 
 from pangocairohelpers import LayoutClusters
 from pangocairohelpers import Side
-from pangocairohelpers.line_string_helper import reverse
+from pangocairohelpers.line_string_helper import reverse, parallel_offset_with_matching_direction
 from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
 from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
 
@@ -144,6 +144,23 @@ class TextPath:
         self._modified_line_string = self._input_line_string
         if self._side == Side.RIGHT:
             self._modified_line_string = reverse(self._modified_line_string)
+
+        if self._vertical_offset != 0:
+            self._modified_line_string, matched_direction = \
+                parallel_offset_with_matching_direction(
+                    self._modified_line_string,
+                    self._vertical_offset
+                )
+
+            if isinstance(self._modified_line_string, LineString):
+                self._modified_line_string = None
+                raise RuntimeError("Failed to offset linestring. "
+                                   "Non-linestring object returned.")
+
+            if not matched_direction:
+                self._modified_line_string = None
+                raise RuntimeError("Failed to offset linestring. "
+                                   "Direction could not be established.")
 
     def _generate_layout_engine(self):
         self._generate_modified_line_string()
