@@ -45,6 +45,7 @@ class TextPath:
 
         self._alignment = Alignment.LEFT
         self._start_offset = 0
+        self._vertical_offset = 0
         self._side = Side.LEFT
 
         self._layout_clusters = LayoutClusters(self._layout)
@@ -97,6 +98,22 @@ class TextPath:
             Defaults to ``0``
         """
         self._start_offset = float(value)
+
+    @property
+    def vertical_offset(self) -> float:
+        return float(self._vertical_offset)
+
+    @vertical_offset.setter
+    def vertical_offset(self, value: float):
+        """
+        :param value:
+            How many units the text should be offset vertically from the
+            ``line_string``. If the line self_intersects, expect for the text
+            path to not render at all.
+
+            Defaults to ``0``
+        """
+        self._vertical_offset = float(value)
 
     @property
     def layout_engine_class(self) -> Type[LayoutEngine]:

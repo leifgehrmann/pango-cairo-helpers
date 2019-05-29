@@ -45,6 +45,17 @@ class TestTextPath(unittest.TestCase):
         assert isinstance(text_path.side, Side)
         assert isinstance(text_path.alignment, Alignment)
         assert isinstance(text_path.start_offset, float)
+        assert isinstance(text_path.vertical_offset, float)
+
+        text_path.side = Side.RIGHT
+        text_path.alignment = Alignment.RIGHT
+        text_path.start_offset = 12
+        text_path.vertical_offset = 34
+
+        assert isinstance(text_path.side, Side)
+        assert isinstance(text_path.alignment, Alignment)
+        assert isinstance(text_path.start_offset, float)
+        assert isinstance(text_path.vertical_offset, float)
 
         text_path.layout_engine_class = Svg
 
