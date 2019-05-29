@@ -8,6 +8,7 @@ from shapely.geometry import LineString
 import unittest
 
 from pangocairohelpers import Side
+from pangocairohelpers.line_string_helper import parallel_offset_with_matching_direction
 from pangocairohelpers.text_path import TextPath
 from pangocairohelpers.text_path.layout_engines import Svg
 from . import debug
@@ -198,5 +199,30 @@ class TestTextPath(unittest.TestCase):
                 cairo_context.set_source_rgba(0, 0, 0, 0.2)
                 debug.draw_line_string(cairo_context, line_string)
                 cairo_context.stroke()
+
+        surface.finish()
+
+    def test_vertical_offset_works(self):
+        surface, cairo_context = self._create_real_surface(
+            'vertical_offset_works.svg'
+        )
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('Hi from Παν語')
+
+        line_string = LineString([[5, 40], [45, 40], [90, 80]])
+
+        for vertical_offset in [-13, 0, 13]:
+            offset_linestring, _ = parallel_offset_with_matching_direction(
+                line_string,
+                vertical_offset
+            )
+            debug.draw_line_string(cairo_context, offset_linestring)
+            cairo_context.set_source_rgba(0, 0, 0, 0.2)
+            cairo_context.stroke()
+
+            text_path = TextPath(line_string, layout)
+            text_path.vertical_offset = vertical_offset
+            cairo_context.set_source_rgb(0, 0, 0)
+            text_path.draw(cairo_context)
 
         surface.finish()

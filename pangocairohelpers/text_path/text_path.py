@@ -152,7 +152,7 @@ class TextPath:
                     self._vertical_offset
                 )
 
-            if isinstance(self._modified_line_string, LineString):
+            if not isinstance(self._modified_line_string, LineString):
                 self._modified_line_string = None
                 raise RuntimeError("Failed to offset linestring. "
                                    "Non-linestring object returned.")
