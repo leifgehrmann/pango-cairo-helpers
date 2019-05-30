@@ -1,8 +1,10 @@
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+
+from cairocffi import Context
 from typing import Type, TypeVar
 
 from pangocffi import Layout, Alignment
-from shapely.geometry import LineString
+from shapely.geometry import LineString, MultiPolygon
 
 from pangocairohelpers import LayoutClusters, Side
 from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
@@ -112,3 +114,33 @@ class TextPathAbstract(object, metaclass=ABCMeta):
             Defaults to ``SvgLayoutEngine``
         """
         self._layout_engine_class = value
+
+    @abstractmethod
+    def text_fits(self) -> bool:
+        """
+        Todo
+
+        :return:
+            Todo
+        """
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def compute_boundaries(self) -> MultiPolygon:
+        """
+        Computes the combined glyph extents for the text path
+
+        :return:
+            a union of glyph extents
+        """
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def draw(self, context: Context):
+        """
+        Todo
+
+        :return:
+            Todo
+        """
+        pass  # pragma: no cover
