@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 from cairocffi import Context
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Optional
 
 from pangocffi import Layout, Alignment
 from shapely.geometry import LineString, MultiPolygon
@@ -38,6 +38,7 @@ class TextPathAbstract(object, metaclass=ABCMeta):
         self._layout_engine = None
 
         self._text_path_glyph_items = None
+        self._text_path_baseline = None
 
     @property
     def side(self) -> Side:
@@ -126,7 +127,17 @@ class TextPathAbstract(object, metaclass=ABCMeta):
         pass  # pragma: no cover
 
     @abstractmethod
-    def compute_boundaries(self) -> MultiPolygon:
+    def compute_baseline(self) -> Optional[LineString]:
+        """
+        Computes the baseline that the text covers
+
+        :return:
+            a linestring representing the baseline of the text
+        """
+        pass  # pragma: no cover
+
+    @abstractmethod
+    def compute_boundaries(self) -> Optional[MultiPolygon]:
         """
         Computes the combined glyph extents for the text path
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from cairocffi import Context
 from pangocffi import Layout
 from shapely.geometry import LineString, MultiPolygon
@@ -90,23 +92,13 @@ class TextPath(TextPathAbstract):
                 generate_text_path_glyph_items()
         return self._text_path_glyph_items
 
-    def compute_boundaries(self) -> MultiPolygon:
-        """
-        Computes the combined glyph extents for the text path
+    def compute_baseline(self) -> Optional[LineString]:
+        pass
 
-        :return:
-            a union of glyph extents
-        """
-        # Todo:
+    def compute_boundaries(self) -> Optional[MultiPolygon]:
         pass
 
     def draw(self, context: Context):
-        """
-        Draws the text path on the context
-
-        :param context:
-            a cairo context
-        """
         text_path_glyph_items = self._compute_text_path_glyph_items()
         for text_path_glyph_item in text_path_glyph_items:
             glyph_position = text_path_glyph_item.position
