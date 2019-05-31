@@ -213,7 +213,27 @@ def angle_at_offset(
 
 
 def reverse(line_string: LineString) -> LineString:
+    """
+    Todo
+    :param line_string:
+    :return:
+    """
     return LineString(list(line_string.coords)[::-1])
+
+
+def substring(
+        line_string: LineString,
+        start: float,
+        end: Optional[float] = None
+) -> LineString:
+    """
+    Todo
+    :param line_string:
+    :param start:
+    :param end:
+    :return:
+    """
+    return line_string
 
 
 def parallel_offset_with_matching_direction(

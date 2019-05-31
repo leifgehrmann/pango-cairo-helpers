@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import pytest
 from shapely.geometry import LineString, Point, JOIN_STYLE, MultiLineString
@@ -229,6 +229,30 @@ test_reverse_data = [
 def test_reverse(line_string: LineString, expected_output: LineString):
     output = helper.reverse(line_string)
     assert list(expected_output.coords) == list(output.coords)
+
+
+test_substring_data = [
+    (
+        LineString([[0, 0], [10, 10], [20, 0]]),
+        0,
+        None,
+        LineString([[0, 0], [10, 10], [20, 0]])
+    )
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,start,end,expected_output",
+    test_substring_data
+)
+def test_substring(
+        line_string: LineString,
+        start: float,
+        end: Optional[float],
+        expected_output: LineString
+):
+    output = helper.substring(line_string, start, end)
+    assert list(output.coords) == list(expected_output.coords)
 
 
 test_parallel_offset_with_matching_direction_data = [
