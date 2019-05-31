@@ -237,6 +237,30 @@ test_substring_data = [
         0,
         None,
         LineString([[0, 0], [10, 10], [20, 0]])
+    ),
+    (
+        LineString([[0, 0], [20, 0]]),
+        12.3,
+        None,
+        LineString([[0, 0], [12.3, 0]])
+    ),
+    (
+        LineString([[0, 0], [20, 0]]),
+        8.2,
+        13.7,
+        LineString([[8.2, 0], [13.7, 0]])
+    ),
+    (
+        LineString([[0, 0], [3, 4], [5, 5]]),
+        5,
+        None,
+        LineString([[0, 0], [3, 4]])
+    ),
+    (
+        LineString([[0, 0], [3, 4], [6, 0], [9, 4]]),
+        5,
+        5,
+        LineString([[3, 4], [6, 0]])
     )
 ]
 
