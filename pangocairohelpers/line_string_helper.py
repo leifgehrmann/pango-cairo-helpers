@@ -225,7 +225,7 @@ def substring(
         line_string: LineString,
         start: float,
         end: Optional[float] = None
-) -> LineString:
+) -> Optional[LineString]:
     """
     Todo
     :param line_string:
@@ -233,7 +233,57 @@ def substring(
     :param end:
     :return:
     """
-    return line_string
+    print(line_string, start, end)
+
+    total_length = line_string.length
+    if start >= total_length:
+        return None
+    if start <= 0 and end is not None and end >= total_length:
+        return line_string
+
+    start_coord = None
+    start_index = None
+    end_coord = None
+    end_index = None
+    coords = list(line_string.coords)
+    for i, p in enumerate(coords):
+        if end is None and start_index is not None:
+            end_index = None
+            break
+
+        pd = line_string.project(Point(p))
+
+        if start_index is None:
+            if pd == start:
+                start_index = i
+            elif pd > start:
+                start_coord = line_string.interpolate(start)
+                start_index = i
+
+        if end is not None:
+            if pd == end:
+                end_index = i + 1
+                break
+            elif pd > end:
+                end_coord = line_string.interpolate(end)
+                end_index = i
+                break
+
+    print(start_index)
+    print(start_coord)
+    print(end_index)
+    print(end_coord)
+
+    new_coords = []
+    if start_coord is not None:
+        new_coords.append([start_coord.x, start_coord.y])
+    print(coords[start_index:end_index])
+    new_coords.extend(coords[start_index:end_index])
+    if end_coord is not None:
+        new_coords.append([end_coord.x, end_coord.y])
+    print(new_coords)
+
+    return LineString(new_coords)
 
 
 def parallel_offset_with_matching_direction(

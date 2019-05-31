@@ -242,7 +242,7 @@ test_substring_data = [
         LineString([[0, 0], [20, 0]]),
         12.3,
         None,
-        LineString([[0, 0], [12.3, 0]])
+        LineString([[12.3, 0], [20, 0]])
     ),
     (
         LineString([[0, 0], [20, 0]]),
@@ -254,14 +254,32 @@ test_substring_data = [
         LineString([[0, 0], [3, 4], [5, 5]]),
         5,
         None,
-        LineString([[0, 0], [3, 4]])
+        LineString([[3, 4], [5, 5]])
     ),
     (
         LineString([[0, 0], [3, 4], [6, 0], [9, 4]]),
         5,
-        5,
+        10,
         LineString([[3, 4], [6, 0]])
-    )
+    ),
+    (
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]]),
+        4.2,
+        12.9,
+        LineString([[4.2, 0], [8, 0], [12, 0], [12.9, 0]])
+    ),
+    (
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]]),
+        0,
+        20,
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]])
+    ),
+(
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]]),
+        30,
+        None,
+        None
+    ),
 ]
 
 
@@ -276,7 +294,10 @@ def test_substring(
         expected_output: LineString
 ):
     output = helper.substring(line_string, start, end)
-    assert list(output.coords) == list(expected_output.coords)
+    if expected_output is None:
+        assert output is None
+    else:
+        assert list(output.coords) == list(expected_output.coords)
 
 
 test_parallel_offset_with_matching_direction_data = [
