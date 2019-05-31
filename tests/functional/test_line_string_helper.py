@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 import pytest
 from shapely.geometry import LineString, Point, JOIN_STYLE, MultiLineString
@@ -229,6 +229,75 @@ test_reverse_data = [
 def test_reverse(line_string: LineString, expected_output: LineString):
     output = helper.reverse(line_string)
     assert list(expected_output.coords) == list(output.coords)
+
+
+test_substring_data = [
+    (
+        LineString([[0, 0], [10, 10], [20, 0]]),
+        0,
+        None,
+        LineString([[0, 0], [10, 10], [20, 0]])
+    ),
+    (
+        LineString([[0, 0], [20, 0]]),
+        12.3,
+        None,
+        LineString([[12.3, 0], [20, 0]])
+    ),
+    (
+        LineString([[0, 0], [20, 0]]),
+        8.2,
+        13.7,
+        LineString([[8.2, 0], [13.7, 0]])
+    ),
+    (
+        LineString([[0, 0], [3, 4], [5, 5]]),
+        5,
+        None,
+        LineString([[3, 4], [5, 5]])
+    ),
+    (
+        LineString([[0, 0], [3, 4], [6, 0], [9, 4]]),
+        5,
+        10,
+        LineString([[3, 4], [6, 0]])
+    ),
+    (
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]]),
+        4.2,
+        12.9,
+        LineString([[4.2, 0], [8, 0], [12, 0], [12.9, 0]])
+    ),
+    (
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]]),
+        0,
+        20,
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]])
+    ),
+    (
+        LineString([[0, 0], [4, 0], [8, 0], [12, 0], [16, 0], [20, 0]]),
+        30,
+        None,
+        None
+    ),
+]
+
+
+@pytest.mark.parametrize(
+    "line_string,start,end,expected_output",
+    test_substring_data
+)
+def test_substring(
+        line_string: LineString,
+        start: float,
+        end: Optional[float],
+        expected_output: LineString
+):
+    output = helper.substring(line_string, start, end)
+    if expected_output is None:
+        assert output is None
+    else:
+        assert list(output.coords) == list(expected_output.coords)
 
 
 test_parallel_offset_with_matching_direction_data = [
