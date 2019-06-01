@@ -1,21 +1,17 @@
-from typing import TypeVar, Type
+from typing import Optional, List
 
 from cairocffi import Context
-from pangocffi import Layout, Alignment
+from pangocffi import Layout
 from shapely.geometry import LineString, MultiPolygon
 from pangocairocffi.render_functions import show_glyph_item
 
-from pangocairohelpers import LayoutClusters
-from pangocairohelpers import Side
-from pangocairohelpers.line_string_helper import reverse, \
+from pangocairohelpers import Side, point_helper
+from pangocairohelpers.line_string_helper import reverse, substring, \
     parallel_offset_with_matching_direction
-from pangocairohelpers.text_path.layout_engines import LayoutEngineAbstract
-from pangocairohelpers.text_path.layout_engines import Svg as SvgLayoutEngine
-
-LayoutEngine = TypeVar('LayoutEngine', bound=LayoutEngineAbstract)
+from pangocairohelpers.text_path import TextPathAbstract, TextPathGlyphItem
 
 
-class TextPath:
+class TextPath(TextPathAbstract):
     """
     Renders text similar to the behaviour found in SVG's ``<textPath>``.
 
@@ -37,109 +33,11 @@ class TextPath:
         :param layout:
             the layout to apply to the ``line_string``
         """
-        if layout.get_line_count() > 1:
-            raise ValueError('layout cannot be more than one line.')
+        super().__init__(line_string, layout)
 
-        self._layout = layout
-        self._layout_text = layout.get_text()
-        self._input_line_string = line_string
-
-        self._alignment = Alignment.LEFT
-        self._start_offset = 0
-        self._vertical_offset = 0
-        self._side = Side.LEFT
-
-        self._layout_clusters = LayoutClusters(self._layout)
-        self._layout_engine_class = SvgLayoutEngine
-        self._layout_engine = None
-
-        self._text_path_glyph_items = None
-
-    @property
-    def side(self) -> Side:
-        return self._side
-
-    @side.setter
-    def side(self, value: Side):
-        """
-        :param value:
-            what side the text should use. For example, for a line going
-            left to right horizontally, the text will appear upright if the
-            side is "left". If it's "right", the text will appear upside down.
-
-            Defaults to ``'Left'``
-        """
-        self._side = value
-
-    @property
-    def alignment(self) -> Alignment:
-        return self._alignment
-
-    @alignment.setter
-    def alignment(self, value: Alignment):
-        """
-        :param value:
-            whether the text should be left, center, or right aligned
-
-            Defaults to ``'Left'``
-        """
-        self._alignment = value
-
-    @property
-    def start_offset(self) -> float:
-        return float(self._start_offset)
-
-    @start_offset.setter
-    def start_offset(self, value: float):
-        """
-        :param value:
-            How far along the ``line_string`` the beginning character should be
-            offset.
-
-            Defaults to ``0``
-        """
-        self._start_offset = float(value)
-
-    @property
-    def vertical_offset(self) -> float:
-        return float(self._vertical_offset)
-
-    @vertical_offset.setter
-    def vertical_offset(self, value: float):
-        """
-        :param value:
-            How many units the text should be offset vertically from the
-            ``line_string``. If the line self_intersects, expect for the text
-            path to not render at all.
-
-            Defaults to ``0``
-        """
-        self._vertical_offset = float(value)
-
-    @property
-    def layout_engine_class(self) -> Type[LayoutEngine]:
-        return self._layout_engine_class
-
-    @layout_engine_class.setter
-    def layout_engine_class(self, value: Type[LayoutEngine]):
-        """
-        :param value:
-            The layout engine class to use when positioning and orientating the
-            text.
-
-            Defaults to ``SvgLayoutEngine``
-        """
-        self._layout_engine_class = value
-
-    def text_fits(self) -> bool:
-        """
-        :return:
-            true if all the glyphs can be rendered on the line
-        """
-        text_path_glyph_items = self._compute_text_path_glyph_items()
-        number_of_layed_out_glyphs = len(text_path_glyph_items)
-        number_of_total_glyphs = len(self._layout_clusters.get_clusters())
-        return number_of_layed_out_glyphs == number_of_total_glyphs
+        self._modified_line_string = None  # type: Optional[LineString]
+        self._text_path_glyph_items = None  \
+            # type: Optional[List[TextPathGlyphItem]]
 
     def _generate_modified_line_string(self):
         self._modified_line_string = self._input_line_string
@@ -181,30 +79,41 @@ class TextPath:
         if self._layout_engine.start_offset != self._start_offset:
             self._layout_engine.start_offset = self._start_offset
 
-    def _compute_text_path_glyph_items(self):
+    def _compute_text_path_glyph_items(self) -> List[TextPathGlyphItem]:
         self._generate_layout_engine()
-        if self._text_path_glyph_items is None:
-            self._text_path_glyph_items = self._layout_engine. \
-                generate_text_path_glyph_items()
+        self._text_path_glyph_items = self._layout_engine. \
+            generate_text_path_glyph_items()
         return self._text_path_glyph_items
 
-    def compute_boundaries(self) -> MultiPolygon:
-        """
-        Computes the combined glyph extents for the text path
+    def text_fits(self) -> bool:
+        text_path_glyph_items = self._compute_text_path_glyph_items()
+        number_of_laid_out_glyphs = len(text_path_glyph_items)
+        number_of_total_glyphs = len(self._layout_clusters.get_clusters())
+        return number_of_laid_out_glyphs == number_of_total_glyphs
 
-        :return:
-            a union of glyph extents
-        """
-        # Todo:
+    def compute_baseline(self) -> Optional[LineString]:
+        text_path_glyph_items = self._compute_text_path_glyph_items()
+
+        # Get the start position
+        start_point = text_path_glyph_items[0].position
+
+        # Get the end position
+        end_glyph = text_path_glyph_items[-1]
+        end_point = point_helper.add_polar_vector(
+            end_glyph.position,
+            end_glyph.rotation,
+            end_glyph.logical_extent.width
+        )
+
+        start_offset = self._modified_line_string.project(start_point)
+        end_offset = self._modified_line_string.project(end_point)
+
+        return substring(self._modified_line_string, start_offset, end_offset)
+
+    def compute_boundaries(self) -> Optional[MultiPolygon]:
         pass
 
     def draw(self, context: Context):
-        """
-        Draws the text path on the context
-
-        :param context:
-            a cairo context
-        """
         text_path_glyph_items = self._compute_text_path_glyph_items()
         for text_path_glyph_item in text_path_glyph_items:
             glyph_position = text_path_glyph_item.position

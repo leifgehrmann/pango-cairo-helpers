@@ -94,7 +94,8 @@ class Svg(LayoutEngineAbstract):
             text_path_glyph_item = TextPathGlyphItem(
                 glyph_item,
                 left_position,
-                rotation
+                rotation,
+                extent
             )
             text_path_glyph_items.append(text_path_glyph_item)
 

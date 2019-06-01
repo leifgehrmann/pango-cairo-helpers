@@ -84,6 +84,28 @@ class TestTextPath(unittest.TestCase):
         text_path = TextPath(line_string, layout)
         assert not text_path.text_fits()
 
+    def test_compute_baseline(self):
+        surface, cairo_context = self._create_real_surface(
+            'compute_baseline.svg'
+        )
+        layout = pangocairocffi.create_layout(cairo_context)
+        layout.set_markup('<span font="8">Hi from Παν語</span>')
+
+        line_string = LineString([[0, 10], [50, 20], [100, 10]])
+        text_path = TextPath(line_string, layout)
+        text_path.alignment = Alignment.CENTER
+        text_path.draw(cairo_context)
+
+        baseline = text_path.compute_baseline()
+        debug.draw_line_string(cairo_context, baseline)
+        cairo_context.stroke()
+
+        assert isinstance(baseline, LineString)
+        assert baseline.length > 0
+        assert baseline.length < line_string.length
+
+        surface.finish()
+
     def test_compute_boundaries(self):
         surface, cairo_context = self._create_real_surface(
             'compute_boundaries.svg'
