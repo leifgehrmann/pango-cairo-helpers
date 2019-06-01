@@ -37,9 +37,6 @@ class TextPathAbstract(object, metaclass=ABCMeta):
         self._layout_engine_class = SvgLayoutEngine
         self._layout_engine = None
 
-        self._text_path_glyph_items = None
-        self._text_path_baseline = None
-
     @property
     def side(self) -> Side:
         return self._side

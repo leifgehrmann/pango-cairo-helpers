@@ -36,6 +36,8 @@ class TextPath(TextPathAbstract):
         super().__init__(line_string, layout)
 
         self._modified_line_string = None  # type: Optional[LineString]
+        self._text_path_glyph_items = None  \
+            # type: Optional[List[TextPathGlyphItem]]
 
     def _generate_modified_line_string(self):
         self._modified_line_string = self._input_line_string
@@ -91,7 +93,7 @@ class TextPath(TextPathAbstract):
 
     def compute_baseline(self) -> Optional[LineString]:
         text_path_glyph_items = self._compute_text_path_glyph_items()
-        
+
         # Get the start position
         start_point = text_path_glyph_items[0].position
 
