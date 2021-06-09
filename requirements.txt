@@ -3,7 +3,7 @@ pangocffi >= 0.4.0
 pangocairocffi >= 0.2.6
 shapely >= 1.6.4.post2
 
-pip==19.0.3
+pip==19.2
 pytest
 tox
 coverage
