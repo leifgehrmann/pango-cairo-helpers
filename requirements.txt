@@ -1,9 +1,9 @@
-cairocffi >= 1.0.2
-pangocffi >= 0.4.0
-pangocairocffi >= 0.2.6
-shapely >= 1.6.4.post2
+cairocffi == 1.2.0
+pangocffi == 0.10.0
+pangocairocffi == 0.6.0
+shapely == 1.7.1
 
-pip==19.0.3
+pip == 21.1.2
 pytest
 tox
 coverage
