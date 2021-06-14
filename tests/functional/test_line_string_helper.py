@@ -356,7 +356,7 @@ test_parallel_offset_with_matching_direction_data = [
         Side.RIGHT,
         LineString([
             [10, 40],
-            [54.14213562373096, 40],
+            [54.14213562373095, 40],
             [97.07106781186548, 82.92893218813452]
         ]),
         True
