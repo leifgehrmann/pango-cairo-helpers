@@ -39,7 +39,7 @@ class TestTextPath(unittest.TestCase):
     def test_setters_getters(self):
         surface, cairo_context = self._create_void_surface()
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[0, 0], [600, 0]])
         text_path = TextPath(line_string, layout)
@@ -64,7 +64,7 @@ class TestTextPath(unittest.TestCase):
     def test_error_is_raised_for_multi_line(self):
         surface, cairo_context = self._create_void_surface()
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語\nThis is a text')
+        layout.apply_markup('Hi from Παν語\nThis is a text')
 
         line_string = LineString([[0, 0], [100, 0]])
 
@@ -74,7 +74,7 @@ class TestTextPath(unittest.TestCase):
     def test_text_fits(self):
         surface, cairo_context = self._create_real_surface('text_fits.svg')
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[0, 0], [600, 0]])
         text_path = TextPath(line_string, layout)
@@ -89,7 +89,7 @@ class TestTextPath(unittest.TestCase):
             'compute_baseline.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('<span font="8">Hi from Παν語</span>')
+        layout.apply_markup('<span font="8">Hi from Παν語</span>')
 
         line_string = LineString([[0, 10], [50, 20], [100, 10]])
         text_path = TextPath(line_string, layout)
@@ -111,7 +111,7 @@ class TestTextPath(unittest.TestCase):
             'compute_boundaries.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[0, 0], [100, 0]])
         text_path = TextPath(line_string, layout)
@@ -120,7 +120,7 @@ class TestTextPath(unittest.TestCase):
     def test_draw(self):
         surface, cairo_context = self._create_real_surface('draw.svg')
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[10, 30], [90, 30]])
         text_path = TextPath(line_string, layout)
@@ -141,7 +141,7 @@ class TestTextPath(unittest.TestCase):
     def test_side(self):
         surface, cairo_context = self._create_real_surface('side.svg')
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[10, 30], [50, 30], [90, 70]])
         text_path = TextPath(line_string, layout)
@@ -165,7 +165,7 @@ class TestTextPath(unittest.TestCase):
             'alignment_with_no_space.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[10, 30], [90, 30]])
         text_path = TextPath(line_string, layout)
@@ -192,7 +192,7 @@ class TestTextPath(unittest.TestCase):
             100
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('<span font="8">Hi from Παν語</span>')
+        layout.apply_markup('<span font="8">Hi from Παν語</span>')
 
         start_offsets = [-10, 0, 10]
         alignments = [Alignment.LEFT, Alignment.CENTER, Alignment.RIGHT]
@@ -230,7 +230,7 @@ class TestTextPath(unittest.TestCase):
             'vertical_offset_works.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[5, 40], [45, 40], [90, 80]])
 
@@ -256,7 +256,7 @@ class TestTextPath(unittest.TestCase):
     def test_vertical_offset_fails_on_uncertain_direction(self):
         surface, cairo_context = self._create_void_surface()
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[0, 0], [1, 0], [0, 1]])
         text_path = TextPath(line_string, layout)
@@ -268,7 +268,7 @@ class TestTextPath(unittest.TestCase):
     def test_vertical_offset_fails_on_invalid_offset_shape(self):
         surface, cairo_context = self._create_void_surface()
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[0, 0], [40, 0], [40, 40], [0, 40], [0, 0]])
         text_path = TextPath(line_string, layout)

@@ -22,7 +22,7 @@ class LayoutClusters:
             a pango layout to decompose into clusters
         """
         self.layout = layout
-        self.text = self.layout.get_text()
+        self.text = self.layout.text
         self.clusters = []
         self.logical_extents = []
         self.max_logical_extent = None
