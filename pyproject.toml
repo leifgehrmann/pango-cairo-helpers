@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "pango-cairo-helpers"
+version = "0.0.1"
+description = "Helper modules for rendering text using pango and cairo"
+authors = ["Leif Gehrmann <leif.gehrmann@gmail.com>"]
+license = "LGPL-2.1"
+readme = "README.md"
+packages = [{include = "pango_cairo_helpers"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+cairocffi = "^1.5.1"
+pangocffi = "^0.11.0"
+pangocairocffi = "^0.7.0"
+shapely = "^2.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+tox = "^4.5.2"
+coverage = "^7.2.7"
+flake8 = "^6.0.0"
+twine = "^4.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
