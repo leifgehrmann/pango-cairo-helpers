@@ -7,8 +7,8 @@ def test_layout_clusters_properties_have_same_length():
     surface = SVGSurface(None, 100, 100)
     cairo_context = Context(surface)
     layout = pangocairocffi.create_layout(cairo_context)
-    layout.set_markup('Hi from Παν語\nThis is a test')
-    expected_length = len(layout.get_text()) - 1  # Subtract newline char
+    layout.apply_markup('Hi from Παν語\nThis is a test')
+    expected_length = len(layout.text) - 1  # Subtract newline char
 
     layout_clusters = LayoutClusters(layout)
 
@@ -24,12 +24,12 @@ def test_layout_clusters_get_max_logical_extent():
     cairo_context = Context(surface)
 
     layout_1 = pangocairocffi.create_layout(cairo_context)
-    layout_1.set_markup('Text with one line')
+    layout_1.apply_markup('Text with one line')
     layout_1_clusters = LayoutClusters(layout_1)
     extent_1 = layout_1_clusters.get_max_logical_extent()
 
     layout_2 = pangocairocffi.create_layout(cairo_context)
-    layout_2.set_markup('text with\ntwo lines')
+    layout_2.apply_markup('text with\ntwo lines')
     layout_2_clusters = LayoutClusters(layout_2)
     extent_2 = layout_2_clusters.get_max_logical_extent()
 

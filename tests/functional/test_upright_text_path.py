@@ -38,7 +38,7 @@ class TestUprightTextPath(unittest.TestCase):
             'upright_text_path_text_fits.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[0, 0], [600, 0]])
         text_path = UprightTextPath(line_string, layout)
@@ -53,7 +53,7 @@ class TestUprightTextPath(unittest.TestCase):
             'upright_text_path_compute_baseline.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('<span font="8">Hi from Παν語</span>')
+        layout.apply_markup('<span font="8">Hi from Παν語</span>')
 
         line_string = LineString([[0, 10], [50, 20], [100, 10]])
         text_path = UprightTextPath(line_string, layout)
@@ -75,7 +75,7 @@ class TestUprightTextPath(unittest.TestCase):
             'upright_text_path_compute_boundaries.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[0, 0], [100, 0]])
         text_path = UprightTextPath(line_string, layout)
@@ -86,7 +86,7 @@ class TestUprightTextPath(unittest.TestCase):
             'upright_text_path_draw.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[10, 30], [90, 30]])
         text_path = UprightTextPath(line_string, layout)
@@ -109,7 +109,7 @@ class TestUprightTextPath(unittest.TestCase):
             'upright_text_path_side.svg'
         )
         layout = pangocairocffi.create_layout(cairo_context)
-        layout.set_markup('Hi from Παν語')
+        layout.apply_markup('Hi from Παν語')
 
         line_string = LineString([[10, 30], [50, 30], [90, 70]])
         text_path = UprightTextPath(line_string, layout)

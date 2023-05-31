@@ -26,7 +26,7 @@ class TextPathAbstract(object, metaclass=ABCMeta):
         self._layout = layout
         self._input_line_string = line_string
 
-        self._layout_text = layout.get_text()
+        self._layout_text = layout.text
 
         self._alignment = Alignment.LEFT
         self._start_offset = 0
